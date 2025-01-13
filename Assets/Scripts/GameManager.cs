@@ -6,6 +6,7 @@ using UnityEngine.SceneManagement;
 public class GameManager : MonoBehaviour
 {
     private int score;
+
     [SerializeField] private TMP_Text scoreText;
     [SerializeField] private TMP_Text countdownText;
 
@@ -14,7 +15,10 @@ public class GameManager : MonoBehaviour
     [SerializeField] private GameObject getReady;
 
     [SerializeField] private Player player;   
-    [SerializeField] private PipeSpawner pipeSpawner;   
+    [SerializeField] private PipeSpawner pipeSpawner;
+
+    public delegate void ScoreDelegate(int score);
+    public static ScoreDelegate onScoreDelegate;
 
     private void Awake()
     {
@@ -71,6 +75,7 @@ public class GameManager : MonoBehaviour
         getReady.SetActive(false);
         scoreText.gameObject.SetActive(true);
         score = 0;
+        onScoreDelegate?.Invoke(score);
         scoreText.text = score.ToString();
 
         player.enabled = true;
@@ -85,9 +90,10 @@ public class GameManager : MonoBehaviour
     public void IncreaseScore()
     {
         score++;
-        Debug.Log(score);
 
         scoreText.text = score.ToString();
+        
+        onScoreDelegate?.Invoke(score);
     }
 
     public void GameOver()
@@ -102,4 +108,5 @@ public class GameManager : MonoBehaviour
     {
         Time.timeScale = 0f;
     }
+
 }
