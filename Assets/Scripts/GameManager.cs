@@ -5,9 +5,6 @@ using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
-    private int score;
-
-    [SerializeField] private TMP_Text scoreText;
     [SerializeField] private TMP_Text countdownText;
 
     [SerializeField] private GameObject playButton;
@@ -17,12 +14,12 @@ public class GameManager : MonoBehaviour
     [SerializeField] private Player player;   
     [SerializeField] private PipeSpawner pipeSpawner;
 
-    public delegate void ScoreDelegate(int score);
-    public static ScoreDelegate onScoreDelegate;
+    private ScoreManager scoreManager;
 
     private void Awake()
     {
-        score = 0;
+        scoreManager = FindObjectOfType<ScoreManager>();
+
         player.enabled = false;
         gameOver.SetActive(false);
         Application.targetFrameRate = 60;   
@@ -31,7 +28,7 @@ public class GameManager : MonoBehaviour
 
     public void OnClick()
     {
-        scoreText.gameObject.SetActive(false);
+        scoreManager.getScoreText().gameObject.SetActive(false);
         pipeSpawner.enabled = false;
         getReady.SetActive(true);
 
@@ -49,6 +46,7 @@ public class GameManager : MonoBehaviour
 
     public IEnumerator OnStart()
     {
+        scoreManager.setScore(0);
         float countdown = 3f;
         playButton.SetActive(false);
         gameOver.SetActive(false);
@@ -73,10 +71,8 @@ public class GameManager : MonoBehaviour
     {
         pipeSpawner.enabled = true;
         getReady.SetActive(false);
-        scoreText.gameObject.SetActive(true);
-        score = 0;
-        onScoreDelegate?.Invoke(score);
-        scoreText.text = score.ToString();
+        scoreManager.getScoreText().gameObject.SetActive(true);
+        scoreManager.setScore(0);
 
         player.enabled = true;
     }
@@ -85,15 +81,6 @@ public class GameManager : MonoBehaviour
     {
         Time.timeScale = 0f;
         player.enabled = true;
-    }
-
-    public void IncreaseScore()
-    {
-        score++;
-
-        scoreText.text = score.ToString();
-        
-        onScoreDelegate?.Invoke(score);
     }
 
     public void GameOver()

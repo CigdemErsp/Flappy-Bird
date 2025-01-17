@@ -1,3 +1,5 @@
+using System.Collections;
+using TMPro;
 using UnityEngine;
 
 public class Player : MonoBehaviour
@@ -6,13 +8,20 @@ public class Player : MonoBehaviour
     public Sprite[] sprites;
     private int spriteIndex;
 
+    [SerializeField] private GameObject superPower;
+
     private Vector3 direction;
     [SerializeField] private float gravity = -9.8f;
     [SerializeField] private float strength = 5f;
 
+    public bool superPowerActivated = false;
+
+    private ScoreManager scoreManager;
+
     private void Awake()
     {
         spriteRenderer = GetComponent<SpriteRenderer>();
+        scoreManager = FindObjectOfType<ScoreManager>();
     }
 
     private void Start()
@@ -54,25 +63,67 @@ public class Player : MonoBehaviour
     private void OnTriggerEnter2D(Collider2D collision)
     {
         if (collision.gameObject.tag == "Obstacle")
+        {
+            if(!superPowerActivated)
+                FindObjectOfType<GameManager>().GameOver();
+            else
+                scoreManager.IncreaseScore();
+        }           
+        else if(collision.gameObject.tag == "Ground")
+        {
             FindObjectOfType<GameManager>().GameOver();
+        }
         else if (collision.gameObject.tag == "Score")
-            FindObjectOfType<GameManager>().IncreaseScore();
+        {
+            collision.gameObject.transform.parent.gameObject.transform.Find("Explosion").gameObject.SetActive(true);
+            Destroy(collision.gameObject);
+            scoreManager.IncreaseCoinCount();
+            scoreManager.IncreaseScore();
+        }
+        else if(collision.gameObject.tag == "heart")
+        {
+            collision.gameObject.transform.parent.gameObject.transform.Find("Explosion").gameObject.SetActive(true);
+            Destroy(collision.gameObject);
+            superPowerActivated = true;
+            superPower.gameObject.SetActive(true);
+            StartCoroutine(ActivateSuperPower());
+        }
+    }
+
+    private IEnumerator ActivateSuperPower()
+    {
+        float countdown = 10f;
+
+        Time.timeScale = 1f;
+
+        while (countdown > 0)
+        {
+            // Wait for 1 second
+            yield return new WaitForSeconds(1);
+
+            // Decrement the countdown
+            countdown--;
+        }
+        superPowerActivated = false;
+        superPower.gameObject.SetActive(false);
     }
 
     private void OnEnable()
     {
-        Vector3 position = transform.position;
-        position.y = 0f;
-        transform.position = position;
-        direction = Vector3.zero;
+        resetPos();
     }
 
-    private void OnDisable()
+    public void OnDisable()
+    {
+        resetPos();
+        InvokeRepeating(nameof(AnimateSprite), 0.15f, 0.15f);
+    }
+
+    private void resetPos()
     {
         Vector3 position = transform.position;
         position.y = 0f;
         transform.position = position;
         direction = Vector3.zero;
-        InvokeRepeating(nameof(AnimateSprite), 0.15f, 0.15f);
     }
 }
