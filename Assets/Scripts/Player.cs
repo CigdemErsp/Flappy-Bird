@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using TMPro;
 using UnityEngine;
@@ -17,6 +18,8 @@ public class Player : MonoBehaviour
     public bool superPowerActivated = false;
 
     private ScoreManager scoreManager;
+
+    public event Action<int> OnCountdownUpdated;
 
     private void Awake()
     {
@@ -73,17 +76,22 @@ public class Player : MonoBehaviour
         {
             FindObjectOfType<GameManager>().GameOver();
         }
-        else if (collision.gameObject.tag == "Score")
+        else if (collision.gameObject.tag == "Coin")
         {
             collision.gameObject.transform.parent.gameObject.transform.Find("Explosion").gameObject.SetActive(true);
-            Destroy(collision.gameObject);
+            collision.gameObject.transform.parent.gameObject.transform.Find("Score Box").gameObject.SetActive(false);
+            collision.gameObject.SetActive(false);
             scoreManager.IncreaseCoinCount();
+            scoreManager.IncreaseScore();
+        }
+        else if (collision.gameObject.tag == "Score")
+        {
             scoreManager.IncreaseScore();
         }
         else if(collision.gameObject.tag == "heart")
         {
             collision.gameObject.transform.parent.gameObject.transform.Find("Explosion").gameObject.SetActive(true);
-            Destroy(collision.gameObject);
+            collision.gameObject.SetActive(false);
             superPowerActivated = true;
             superPower.gameObject.SetActive(true);
             StartCoroutine(ActivateSuperPower());
@@ -96,30 +104,33 @@ public class Player : MonoBehaviour
 
         Time.timeScale = 1f;
 
-        while (countdown > 0)
+        while (countdown >= 0)
         {
+            OnCountdownUpdated?.Invoke(((int)countdown));
             // Wait for 1 second
             yield return new WaitForSeconds(1);
 
             // Decrement the countdown
             countdown--;
         }
+        OnCountdownUpdated?.Invoke(-1);
         superPowerActivated = false;
         superPower.gameObject.SetActive(false);
     }
 
     private void OnEnable()
     {
-        resetPos();
+        ResetPos();
     }
 
     public void OnDisable()
     {
-        resetPos();
+        superPower.gameObject.SetActive(false);
+        ResetPos();
         InvokeRepeating(nameof(AnimateSprite), 0.15f, 0.15f);
     }
 
-    private void resetPos()
+    private void ResetPos()
     {
         Vector3 position = transform.position;
         position.y = 0f;

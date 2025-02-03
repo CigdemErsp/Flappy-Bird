@@ -2,10 +2,12 @@ using UnityEngine;
 using TMPro;
 using System.Collections;
 using UnityEngine.SceneManagement;
+using System.Collections.Generic;
 
 public class GameManager : MonoBehaviour
 {
     [SerializeField] private TMP_Text countdownText;
+    [SerializeField] private TMP_Text superPowerCountdown;
 
     [SerializeField] private GameObject playButton;
     [SerializeField] private GameObject gameOver;
@@ -15,29 +17,26 @@ public class GameManager : MonoBehaviour
     [SerializeField] private PipeSpawner pipeSpawner;
 
     private ScoreManager scoreManager;
+    LeaderboardManager leaderboardManager;
 
     private void Awake()
     {
         scoreManager = FindObjectOfType<ScoreManager>();
+        leaderboardManager = FindObjectOfType<LeaderboardManager>();
 
         player.enabled = false;
         gameOver.SetActive(false);
         Application.targetFrameRate = 60;   
         pipeSpawner.enabled = false;
+        player.OnCountdownUpdated += UpdateCountdownText;
     }
 
     public void OnClick()
     {
-        scoreManager.getScoreText().gameObject.SetActive(false);
+        leaderboardManager.enabled = false;
+        scoreManager.ScoreText.gameObject.SetActive(false);
         pipeSpawner.enabled = false;
         getReady.SetActive(true);
-
-        Pipes[] pipes = FindObjectsOfType<Pipes>();
-
-        for (int i = 0; i < pipes.Length; i++)
-        {
-            Destroy(pipes[i].gameObject);
-        }
 
         countdownText.gameObject.SetActive(true);
         player.enabled = false;
@@ -46,7 +45,9 @@ public class GameManager : MonoBehaviour
 
     public IEnumerator OnStart()
     {
-        scoreManager.setScore(0);
+        scoreManager.Score = 0;
+        scoreManager.CoinCount = 0;
+        FindObjectOfType<Pipes>().Score = scoreManager.Score;
         float countdown = 3f;
         playButton.SetActive(false);
         gameOver.SetActive(false);
@@ -71,8 +72,8 @@ public class GameManager : MonoBehaviour
     {
         pipeSpawner.enabled = true;
         getReady.SetActive(false);
-        scoreManager.getScoreText().gameObject.SetActive(true);
-        scoreManager.setScore(0);
+        scoreManager.ScoreText.gameObject.SetActive(true);
+        scoreManager.Score = 0;
 
         player.enabled = true;
     }
@@ -85,10 +86,32 @@ public class GameManager : MonoBehaviour
 
     public void GameOver()
     {
+        scoreManager.CheckHighscore();
         gameOver.SetActive(true);
         playButton.SetActive(true);
+        superPowerCountdown.gameObject.SetActive(false);
+        player.StopAllCoroutines();
+        player.superPowerActivated = false;
+
+        leaderboardManager.enabled = true;
 
         Pause();
+    }
+
+    private void UpdateCountdownText(int countdown)
+    {
+        if (countdown >= 0)
+        {
+            superPowerCountdown.text = countdown.ToString();
+            if (!superPowerCountdown.IsActive())
+            {
+                superPowerCountdown.gameObject.SetActive(true);
+            }
+        }
+        else
+        {
+            superPowerCountdown.gameObject.SetActive(false);
+        }
     }
 
     void OnEnable()

@@ -1,11 +1,11 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class PipeSpawner : MonoBehaviour
 {
-    [SerializeField] private GameObject[] pipesPrefab;
+    [SerializeField] private GameObject pipesPrefabWithHeart;
+    [SerializeField] private List<GameObject> pipesPrefabs;
     private float spawnRate = 2f;
     [SerializeField] private float minHeight = -1f;
     [SerializeField] private float maxHeight = 1f;
@@ -27,69 +27,139 @@ public class PipeSpawner : MonoBehaviour
     private void OnDisable()
     {
         CancelInvoke(nameof(Spawn));
+        if (!gameObject.activeInHierarchy) return;
+        ReplacePipe(pipesPrefabWithHeart);
+
+        Debug.Log(pipesPrefabWithHeart.GetComponent<Pipes>().IsGapAdjusted);
+        if(pipesPrefabWithHeart.GetComponent<Pipes>().IsGapAdjusted)
+            ResetGap(pipesPrefabWithHeart);
+
+        foreach (var pipe in pipesPrefabs)
+        {
+            ReplacePipe(pipe);
+            Debug.Log(pipe.GetComponent<Pipes>().IsGapAdjusted);
+            if (pipe.GetComponent<Pipes>().IsGapAdjusted)
+                ResetGap(pipe);
+        }
     }
 
     private void Spawn()
     {
-        if(score < 5)
-            UpdateScore();
+        UpdateScore();
 
-        int index = 0;
-     
-        if (allPipes.Count != 0 && allPipes.Contains(1))
+        GameObject pipe;
+        int superPowerNotExists = 1; // if 0 = there is heart in scene/superpower is activated, do not add another pipe with heart to scene
+
+        if ((allPipes.Count != 0 && allPipes.Contains(1)) || FindObjectOfType<Player>().superPowerActivated)
         {
-            // Debug.Log(allPipes.Count);
-           
-            index = 0;
-            
+            superPowerNotExists = 0;
         }
-        else if(FindObjectOfType<Player>().superPowerActivated)
+
+        if(superPowerNotExists == 0)
         {
-            index = 0;
+            pipe = pipesPrefabs[0];
+            pipe.transform.position += Vector3.up * UnityEngine.Random.Range(minHeight, maxHeight);
+            pipesPrefabs.RemoveAt(0); // removed, will be added
+            pipesPrefabs.Add(pipe);
+            UpdatePipes(0);
         }
         else
         {
-            int rand = UnityEngine.Random.Range(0, 2);
-            
-            if (rand == 0)
+            System.Random random = new System.Random();
+            if (random.Next(2) == 0) // spawn heart
             {
-                index = 1;
+                pipe = pipesPrefabWithHeart;
+                pipe.transform.position += Vector3.up * UnityEngine.Random.Range(minHeight, maxHeight);
+                UpdatePipes(1);
+            }
+            else
+            {
+                pipe = pipesPrefabs[0];
+                pipe.transform.position += Vector3.up * UnityEngine.Random.Range(minHeight, maxHeight);
+                pipesPrefabs.RemoveAt(0); // removed, will be added
+                pipesPrefabs.Add(pipe);
+                UpdatePipes(0);
             }
         }
+    
+        pipe.GetComponent<Pipes>().enabled = true;
 
-        GameObject pipe = pipesPrefab[index];
-        updatePipes(index);
-        GameObject pipes = Instantiate(pipe, transform.position, Quaternion.identity);
-        pipes.transform.position += Vector3.up * UnityEngine.Random.Range(minHeight, maxHeight);
-
-        if (score >= 5)
+        if (score >= 5 && !pipe.GetComponent<Pipes>().IsGapAdjusted)
         {
-            Transform upperPipe = pipes.transform.Find("Upper Pipe");
-            Transform bottomPipe = pipes.transform.Find("Bottom Pipe");
-            Transform scoreBox = pipes.transform.Find("Score Box");
-
-            Vector3 upperPipeCurrentPosition = upperPipe.position;
-            Vector3 bottomPipeCurrentPosition = bottomPipe.position;
-            Vector3 scoreBoxLocalScale = scoreBox.localScale;
-
-            // Modify only the y component and keep the x and z components unchanged
-            upperPipe.position = new Vector3(upperPipeCurrentPosition.x, upperPipeCurrentPosition.y - 0.5f, upperPipeCurrentPosition.z);
-            bottomPipe.position = new Vector3(bottomPipeCurrentPosition.x, bottomPipeCurrentPosition.y + 0.5f, bottomPipeCurrentPosition.z);
-            scoreBox.localScale = new Vector3(scoreBoxLocalScale.x, scoreBoxLocalScale.y + 0.5f, scoreBoxLocalScale.z);
+            NarrowGap(pipe);
+            score++;
         }
     }
 
-    private void updatePipes(int i)
+    private void NarrowGap(GameObject pipe)
+    {
+        pipe.GetComponent<Pipes>().IsGapAdjusted = true;
+        Transform upperPipe = pipe.transform.Find("Upper Pipe");
+        Transform bottomPipe = pipe.transform.Find("Bottom Pipe");
+        Transform scoreBox = pipe.transform.Find("Score Box");
+
+        Vector3 upperPipeCurrentPosition = upperPipe.position;
+        Vector3 bottomPipeCurrentPosition = bottomPipe.position;
+        Vector3 scoreBoxLocalScale = scoreBox.localScale;
+
+        // Modify only the y component and keep the x and z components unchanged
+        upperPipe.position = new Vector3(upperPipeCurrentPosition.x, upperPipeCurrentPosition.y - 0.5f, upperPipeCurrentPosition.z);
+        bottomPipe.position = new Vector3(bottomPipeCurrentPosition.x, bottomPipeCurrentPosition.y + 0.5f, bottomPipeCurrentPosition.z);
+        scoreBox.localScale = new Vector3(scoreBoxLocalScale.x, scoreBoxLocalScale.y + 0.5f, scoreBoxLocalScale.z);   
+    }
+
+    private void ResetGap(GameObject pipe)
+    {
+        pipe.GetComponent<Pipes>().IsGapAdjusted = false;
+        Transform upperPipe = pipe.transform.Find("Upper Pipe");
+        Transform bottomPipe = pipe.transform.Find("Bottom Pipe");
+        Transform scoreBox = pipe.transform.Find("Score Box");
+
+        Vector3 upperPipeCurrentPosition = upperPipe.position;
+        Vector3 bottomPipeCurrentPosition = bottomPipe.position;
+        Vector3 scoreBoxLocalScale = scoreBox.localScale;
+
+        // Modify only the y component and keep the x and z components unchanged
+        upperPipe.position = new Vector3(upperPipeCurrentPosition.x, upperPipeCurrentPosition.y + 0.5f, upperPipeCurrentPosition.z);
+        bottomPipe.position = new Vector3(bottomPipeCurrentPosition.x, bottomPipeCurrentPosition.y - 0.5f, bottomPipeCurrentPosition.z);
+        scoreBox.localScale = new Vector3(scoreBoxLocalScale.x, scoreBoxLocalScale.y - 0.5f, scoreBoxLocalScale.z);
+    }
+
+    private void UpdatePipes(int i)
     {
         allPipes.Add(i);
     }
 
-    public void removePipe()
+    public void RemovePipe()
     {
         allPipes.RemoveAt(0);
     }
+
+    public void AddPipe(GameObject pipe)
+    {
+        pipesPrefabs.Add(pipe);
+    }
     private void UpdateScore()
     {
-        score = FindObjectOfType<ScoreManager>().getScore();
+        score = FindObjectOfType<ScoreManager>().Score;
     }
+
+    public void ReplacePipe(GameObject pipe)
+    {
+        pipe.GetComponent<Pipes>().enabled = false;
+        pipe.transform.position = new Vector3(15,0,0);
+        Transform scoreBox = pipe.transform.Find("Coin");
+        if (scoreBox == null)
+        {
+            scoreBox = pipe.transform.Find("Heart11");
+        }
+
+        Transform explosion = pipe.transform.Find("Explosion");
+        Transform score = pipe.transform.Find("Score Box");
+
+        scoreBox.gameObject.SetActive(true);
+        explosion.gameObject.SetActive(false);
+        score.gameObject.SetActive(true);
+    }
+
 }

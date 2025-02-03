@@ -8,6 +8,7 @@ TagManager:
   - Obstacle
   - heart
   - Ground
+  - Coin
   layers:
   - Default
   - TransparentFX
