@@ -7,7 +7,6 @@ public class Pipes : MonoBehaviour
 {
     [SerializeField] private float speed = 5f;
     private float leftEdge;
-    private Vector3 position;
 
     private int movingUp = 1;
     private int score;

@@ -6,9 +6,10 @@ public class PipeSpawner : MonoBehaviour
 {
     [SerializeField] private GameObject pipesPrefabWithHeart;
     [SerializeField] private List<GameObject> pipesPrefabs;
-    private float spawnRate = 2f;
+    
     [SerializeField] private float minHeight = -1f;
     [SerializeField] private float maxHeight = 1f;
+    private float spawnRate = 2f;
 
     private int score;
 

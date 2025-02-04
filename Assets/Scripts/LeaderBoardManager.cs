@@ -15,7 +15,7 @@ public class LeaderboardManager : MonoBehaviour
 
     public void AddScore(int newScore)
     { 
-        if (scores.Count < 5 || newScore > scores[scores.Count - 1])
+        if (scores.Count < 5 || newScore > scores[^1])
         {
             scores.Add(newScore);
             scores.Sort((a, b) => b.CompareTo(a)); 

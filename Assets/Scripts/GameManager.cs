@@ -17,7 +17,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private PipeSpawner pipeSpawner;
 
     private ScoreManager scoreManager;
-    LeaderboardManager leaderboardManager;
+    private LeaderboardManager leaderboardManager;
 
     private void Awake()
     {
