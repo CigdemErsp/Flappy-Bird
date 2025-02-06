@@ -146,7 +146,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &2842326513483924921
 Transform:
   m_ObjectHideFlags: 0
@@ -216,7 +216,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5521259665261969576}
-  - component: {fileID: 5721435775512596480}
+  - component: {fileID: 5292723577841202322}
   m_Layer: 0
   m_Name: Pipes with heart
   m_TagString: Untagged
@@ -244,7 +244,7 @@ Transform:
   - {fileID: 2722492570334319784}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &5721435775512596480
+--- !u!114 &5292723577841202322
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -257,6 +257,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   speed: 5
+  isGapAdjusted: 0
 --- !u!1 &4775633300332680678
 GameObject:
   m_ObjectHideFlags: 0

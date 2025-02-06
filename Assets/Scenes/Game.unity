@@ -1389,10 +1389,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 1199201031899326562, guid: 0de2faf9b9ab40643878effe88f88c05, type: 3}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 3846117309480171031, guid: 0de2faf9b9ab40643878effe88f88c05, type: 3}
       propertyPath: m_Name
       value: Pipes with heart
@@ -1435,10 +1431,6 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5521259665261969576, guid: 0de2faf9b9ab40643878effe88f88c05, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5721435775512596480, guid: 0de2faf9b9ab40643878effe88f88c05, type: 3}
-      propertyPath: m_Enabled
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
@@ -1545,6 +1537,7 @@ GameObject:
   - component: {fileID: 1069757105}
   - component: {fileID: 1069757104}
   - component: {fileID: 1069757108}
+  - component: {fileID: 1069757109}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -1584,9 +1577,9 @@ CircleCollider2D:
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0.0011854854, y: -0.00058336346}
+  m_Offset: {x: 0.006232238, y: -0.0005833626}
   serializedVersion: 2
-  m_Radius: 0.06111738
+  m_Radius: 0.066164136
 --- !u!50 &1069757105
 Rigidbody2D:
   serializedVersion: 4
@@ -1694,14 +1687,31 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 538e44881756ec645ab6d90db94a427d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  sprites:
-  - {fileID: 21300000, guid: fc5923a6996d41146a253c5c39515896, type: 3}
-  - {fileID: 21300000, guid: 1f68e9f4947ad6643bffad6aed01cb9a, type: 3}
-  - {fileID: 21300000, guid: 4f7fe28e048c765438fa8a7bc33a7f58, type: 3}
   superPower: {fileID: 707289266}
   gravity: -9.8
   strength: 5
   superPowerActivated: 0
+--- !u!95 &1069757109
+Animator:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1069757103}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 70a3dbd370e60ef4abe31b151f981637, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &1074431821
 GameObject:
   m_ObjectHideFlags: 0

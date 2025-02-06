@@ -5,10 +5,6 @@ using UnityEngine;
 
 public class Player : MonoBehaviour
 {
-    private SpriteRenderer spriteRenderer;
-    public Sprite[] sprites;
-    private int spriteIndex;
-
     [SerializeField] private GameObject superPower;
 
     private Vector3 direction;
@@ -23,13 +19,8 @@ public class Player : MonoBehaviour
 
     private void Awake()
     {
-        spriteRenderer = GetComponent<SpriteRenderer>();
         scoreManager = FindObjectOfType<ScoreManager>();
-    }
 
-    private void Start()
-    {
-        InvokeRepeating(nameof(AnimateSprite), 0.15f, 0.15f);
     }
 
     private void Update()
@@ -43,24 +34,17 @@ public class Player : MonoBehaviour
         {
             Touch touch = Input.GetTouch(0);
 
-            if(touch.phase == TouchPhase.Began) // beginning to touch
+            if (touch.phase == TouchPhase.Began)
+            {  // beginning to touch
                 direction = Vector3.up * strength;
+            }
         }
 
         direction.y += gravity * Time.deltaTime;
         transform.position += direction * Time.deltaTime;
-    }
 
-    private void AnimateSprite()
-    {
-        spriteIndex++;
-
-        if (spriteIndex >= sprites.Length)
-        {
-            spriteIndex = 0;
-        }
-
-        spriteRenderer.sprite = sprites[spriteIndex];
+        float angle = Mathf.Clamp(direction.y * 5f, -45f, 45f); // Adjust sensitivity if needed
+        transform.rotation = Quaternion.Euler(0, 0, angle);
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
@@ -84,16 +68,16 @@ public class Player : MonoBehaviour
             scoreManager.IncreaseCoinCount();
             scoreManager.IncreaseScore();
         }
-        else if (collision.gameObject.tag == "Score")
+        else if (collision.gameObject.CompareTag("Score"))
         {
             scoreManager.IncreaseScore();
         }
-        else if(collision.gameObject.tag == "heart")
+        else if(collision.gameObject.CompareTag("heart"))
         {
             collision.gameObject.transform.parent.gameObject.transform.Find("Explosion").gameObject.SetActive(true);
             collision.gameObject.SetActive(false);
             superPowerActivated = true;
-            superPower.gameObject.SetActive(true);
+            superPower.SetActive(true);
             StartCoroutine(ActivateSuperPower());
         }
     }
@@ -115,7 +99,7 @@ public class Player : MonoBehaviour
         }
         OnCountdownUpdated?.Invoke(-1);
         superPowerActivated = false;
-        superPower.gameObject.SetActive(false);
+        superPower.SetActive(false);
     }
 
     private void OnEnable()
@@ -127,7 +111,6 @@ public class Player : MonoBehaviour
     {
         superPower.gameObject.SetActive(false);
         ResetPos();
-        InvokeRepeating(nameof(AnimateSprite), 0.15f, 0.15f);
     }
 
     private void ResetPos()
@@ -136,5 +119,6 @@ public class Player : MonoBehaviour
         position.y = 0f;
         transform.position = position;
         direction = Vector3.zero;
+        transform.rotation = Quaternion.Euler(0, 0, 0);
     }
 }

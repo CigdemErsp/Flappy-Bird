@@ -31,14 +31,12 @@ public class PipeSpawner : MonoBehaviour
         if (!gameObject.activeInHierarchy) return;
         ReplacePipe(pipesPrefabWithHeart);
 
-        Debug.Log(pipesPrefabWithHeart.GetComponent<Pipes>().IsGapAdjusted);
         if(pipesPrefabWithHeart.GetComponent<Pipes>().IsGapAdjusted)
             ResetGap(pipesPrefabWithHeart);
 
         foreach (var pipe in pipesPrefabs)
         {
             ReplacePipe(pipe);
-            Debug.Log(pipe.GetComponent<Pipes>().IsGapAdjusted);
             if (pipe.GetComponent<Pipes>().IsGapAdjusted)
                 ResetGap(pipe);
         }
