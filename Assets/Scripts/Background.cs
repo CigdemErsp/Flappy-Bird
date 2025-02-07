@@ -5,6 +5,8 @@ public class Background : MonoBehaviour
     private MeshRenderer meshRenderer;
     [SerializeField] private float animationSpeed = 1f;
 
+    public float AnimationSpeed {  get { return animationSpeed; } set { animationSpeed = value; } }
+
     private void Awake()
     {
         meshRenderer = GetComponent<MeshRenderer>();

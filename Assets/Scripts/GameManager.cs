@@ -37,6 +37,7 @@ public class GameManager : MonoBehaviour
         scoreManager.ScoreText.gameObject.SetActive(false);
         pipeSpawner.enabled = false;
         getReady.SetActive(true);
+        FindObjectOfType<DistanceTracker>().ResetDistance();
 
         countdownText.gameObject.SetActive(true);
         player.enabled = false;
@@ -70,6 +71,7 @@ public class GameManager : MonoBehaviour
 
     public void Play()
     {
+        FindObjectOfType<DistanceTracker>().enabled = true;
         pipeSpawner.enabled = true;
         getReady.SetActive(false);
         scoreManager.ScoreText.gameObject.SetActive(true);
@@ -80,6 +82,7 @@ public class GameManager : MonoBehaviour
 
     public void Pause()
     {
+        FindObjectOfType<DistanceTracker>().enabled = false;
         Time.timeScale = 0f;
         player.enabled = true;
     }
