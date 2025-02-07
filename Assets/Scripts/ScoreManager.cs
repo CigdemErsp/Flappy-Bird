@@ -66,6 +66,6 @@ public class ScoreManager : MonoBehaviour
             PlayerPrefs.SetInt("Highscore", score);
             highscoreText.text = "Highscore: " + score.ToString();
         }
-        leaderboardManager.AddScore(score);
+        leaderboardManager.AddScore(score, coinCount);
     }
 }

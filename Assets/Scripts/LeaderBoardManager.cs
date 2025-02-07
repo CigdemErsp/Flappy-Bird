@@ -4,8 +4,9 @@ using UnityEngine;
 
 public class LeaderboardManager : MonoBehaviour
 {
-    private List<int> scores = new List<int>();
+    private List<(int score, int coins)> scores = new List<(int, int)>(); // Store both score and coins
     [SerializeField] private TextMeshProUGUI[] scoreTexts;
+    [SerializeField] private TextMeshProUGUI[] coinTexts;
     [SerializeField] private GameObject leaderBoard;
 
     private void Start()
@@ -13,12 +14,12 @@ public class LeaderboardManager : MonoBehaviour
         UpdateLeaderboardUI();
     }
 
-    public void AddScore(int newScore)
-    { 
-        if (scores.Count < 5 || newScore > scores[^1])
+    public void AddScore(int newScore, int newCoins)
+    {
+        if (scores.Count < 5 || newScore > scores[^1].score)
         {
-            scores.Add(newScore);
-            scores.Sort((a, b) => b.CompareTo(a)); 
+            scores.Add((newScore, newCoins));
+            scores.Sort((a, b) => b.score.CompareTo(a.score)); // Sort by score (descending)
 
             if (scores.Count > 5)
             {
@@ -29,19 +30,21 @@ public class LeaderboardManager : MonoBehaviour
         }
     }
 
-    public List<int> GetScores()
+    public List<(int, int)> GetScores()
     {
         return scores;
     }
 
     private void SaveScores()
     {
+        PlayerPrefs.SetInt("HighscoreCount", scores.Count);
+
         for (int i = 0; i < scores.Count; i++)
         {
-            PlayerPrefs.SetInt($"Score{i}", scores[i]);
+            PlayerPrefs.SetInt($"Score{i}", scores[i].score);
+            PlayerPrefs.SetInt($"Coins{i}", scores[i].coins);
         }
 
-        PlayerPrefs.SetInt("HighscoreCount", scores.Count);
         PlayerPrefs.Save();
     }
 
@@ -52,22 +55,27 @@ public class LeaderboardManager : MonoBehaviour
 
         for (int i = 0; i < scoreCount; i++)
         {
-            scores.Add(PlayerPrefs.GetInt($"Score{i}", 0));
+            int score = PlayerPrefs.GetInt($"Score{i}", 0);
+            int coins = PlayerPrefs.GetInt($"Coins{i}", 0);
+            scores.Add((score, coins));
         }
     }
 
     public void UpdateLeaderboardUI()
     {
         LoadScores();
+
         for (int i = 0; i < scoreTexts.Length; i++)
         {
             if (i < scores.Count)
             {
-                scoreTexts[i].text = scores[i].ToString();
+                scoreTexts[i].text = scores[i].score.ToString();
+                coinTexts[i].text = scores[i].coins.ToString();
             }
             else
             {
                 scoreTexts[i].text = "";
+                coinTexts[i].text = "";
             }
         }
     }
