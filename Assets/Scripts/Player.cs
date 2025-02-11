@@ -16,6 +16,7 @@ public class Player : MonoBehaviour
     private ScoreManager scoreManager;
 
     public event Action<int> OnCountdownUpdated;
+    public event Action OnGameEnd;
 
     private void Awake()
     {
@@ -80,6 +81,11 @@ public class Player : MonoBehaviour
             superPower.SetActive(true);
             StartCoroutine(ActivateSuperPower());
         }
+        else if(collision.gameObject.CompareTag("GameEnd"))
+        {
+            collision.gameObject.transform.Find("Explosion").gameObject.SetActive(true);
+            OnGameEnd?.Invoke();
+        }
     }
 
     private IEnumerator ActivateSuperPower()
@@ -121,4 +127,34 @@ public class Player : MonoBehaviour
         direction = Vector3.zero;
         transform.rotation = Quaternion.Euler(0, 0, 0);
     }
+
+    private IEnumerator SmoothResetPos()
+    {
+        Vector3 startPosition = transform.position;
+        Vector3 targetPosition = new Vector3(transform.position.x, 0f, transform.position.z);
+        Quaternion startRotation = transform.rotation;
+        Quaternion targetRotation = Quaternion.Euler(0, 0, 0);
+
+        float elapsed = 0f;
+
+        while (elapsed < 1f)
+        {
+            elapsed += Time.deltaTime;
+            float t = elapsed / 1f; // Normalize to 0-1 range
+
+            transform.position = Vector3.Lerp(startPosition, targetPosition, t);
+            transform.rotation = Quaternion.Lerp(startRotation, targetRotation, t);
+
+            yield return null;
+        }
+
+        transform.position = targetPosition;
+        transform.rotation = targetRotation;
+    }
+
+    public void StartSmoothResetPos()
+    {
+        StartCoroutine(SmoothResetPos());
+    }
+
 }

@@ -5,13 +5,15 @@ using UnityEngine;
 
 public class Pipes : MonoBehaviour
 {
-    [SerializeField] private float speed = 5f;
+    private float speed;
     private float leftEdge;
 
     private int movingUp = 1;
     private int score;
     private Vector3 initialPosition;
     public bool isGapAdjusted;
+
+    private Background background;
 
     public bool IsGapAdjusted {  
         get { return isGapAdjusted; }
@@ -25,9 +27,15 @@ public class Pipes : MonoBehaviour
         leftEdge = Camera.main.ScreenToWorldPoint(new Vector3(0, 0, Camera.main.nearClipPlane)).x - 1f; // completely left the scene   
     }
 
+    private void Awake()
+    {
+        background = FindObjectOfType<Background>();
+    }
+
     private void Update()
     {
-        transform.position += Vector3.left * speed * Time.deltaTime;
+        speed = background.AnimationSpeed * 5;
+        transform.position += speed * Time.deltaTime * Vector3.left;
 
         // Check if score is greater than 10 for vertical movement
         if (score >= 10)

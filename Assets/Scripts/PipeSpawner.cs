@@ -6,23 +6,44 @@ public class PipeSpawner : MonoBehaviour
 {
     [SerializeField] private GameObject pipesPrefabWithHeart;
     [SerializeField] private List<GameObject> pipesPrefabs;
+    [SerializeField] private GameObject endFlag;
     
     [SerializeField] private float minHeight = -1f;
     [SerializeField] private float maxHeight = 1f;
-    private float spawnRate = 2f;
 
     private int score;
 
     private List<int> allPipes;
 
+    private float lastSpawnDistance = 0f;
+    private float spawnThreshold = 3f; // Spawn every 3 distance traveled
+    private DistanceTracker distanceTracker;
+    private int distanceNeededToWin = 12;
+
+    public int DistanceNeededToWin {  get { return distanceNeededToWin; } }
+
+    public float SpawnThreshold { get { return spawnThreshold; } }
+
+    private void Update()
+    {
+        if (distanceTracker.GetDistanceTraveled() - lastSpawnDistance >= spawnThreshold)
+        {
+            Debug.Log("sasas");
+            Spawn();
+            lastSpawnDistance = distanceTracker.GetDistanceTraveled();
+        }
+    }
+
     private void Awake()
     {
+        distanceTracker = FindObjectOfType<DistanceTracker>();
         allPipes = new List<int>();
     }
 
     private void OnEnable()
     {
-        InvokeRepeating(nameof(Spawn), spawnRate, spawnRate);
+        lastSpawnDistance = 0f;
+        Spawn();
     }
 
     private void OnDisable()
@@ -54,24 +75,15 @@ public class PipeSpawner : MonoBehaviour
             superPowerNotExists = 0;
         }
 
-        if(superPowerNotExists == 0)
+        if (distanceTracker.GetDistanceTraveled() >= distanceNeededToWin)
         {
-            pipe = pipesPrefabs[0];
-            pipe.transform.position += Vector3.up * UnityEngine.Random.Range(minHeight, maxHeight);
-            pipesPrefabs.RemoveAt(0); // removed, will be added
-            pipesPrefabs.Add(pipe);
-            UpdatePipes(0);
+            pipe = endFlag;
+            pipe.GetComponent<EndFlag>().enabled = true;
+            CancelInvoke(nameof(Spawn));
         }
         else
         {
-            System.Random random = new System.Random();
-            if (random.Next(2) == 0) // spawn heart
-            {
-                pipe = pipesPrefabWithHeart;
-                pipe.transform.position += Vector3.up * UnityEngine.Random.Range(minHeight, maxHeight);
-                UpdatePipes(1);
-            }
-            else
+            if (superPowerNotExists == 0)
             {
                 pipe = pipesPrefabs[0];
                 pipe.transform.position += Vector3.up * UnityEngine.Random.Range(minHeight, maxHeight);
@@ -79,14 +91,32 @@ public class PipeSpawner : MonoBehaviour
                 pipesPrefabs.Add(pipe);
                 UpdatePipes(0);
             }
-        }
-    
-        pipe.GetComponent<Pipes>().enabled = true;
+            else
+            {
+                System.Random random = new System.Random();
+                if (random.Next(2) == 0) // spawn heart
+                {
+                    pipe = pipesPrefabWithHeart;
+                    pipe.transform.position += Vector3.up * UnityEngine.Random.Range(minHeight, maxHeight);
+                    UpdatePipes(1);
+                }
+                else
+                {
+                    pipe = pipesPrefabs[0];
+                    pipe.transform.position += Vector3.up * UnityEngine.Random.Range(minHeight, maxHeight);
+                    pipesPrefabs.RemoveAt(0); // removed, will be added
+                    pipesPrefabs.Add(pipe);
+                    UpdatePipes(0);
+                }
+            }
 
-        if (score >= 5 && !pipe.GetComponent<Pipes>().IsGapAdjusted)
-        {
-            NarrowGap(pipe);
-            score++;
+            pipe.GetComponent<Pipes>().enabled = true;
+
+            if (score >= 5 && !pipe.GetComponent<Pipes>().IsGapAdjusted)
+            {
+                NarrowGap(pipe);
+                score++;
+            }
         }
     }
 
@@ -146,7 +176,8 @@ public class PipeSpawner : MonoBehaviour
     public void ReplacePipe(GameObject pipe)
     {
         pipe.GetComponent<Pipes>().enabled = false;
-        pipe.transform.position = new Vector3(15,0,0);
+        pipe.transform.position = new Vector3(10,0,0);
+
         Transform scoreBox = pipe.transform.Find("Coin");
         if (scoreBox == null)
         {

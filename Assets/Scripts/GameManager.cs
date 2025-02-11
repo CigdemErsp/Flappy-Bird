@@ -117,9 +117,26 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    public void GameEnd() 
+    {
+        FindObjectOfType<DistanceTracker>().enabled = false;
+        scoreManager.CheckHighscore();
+        superPowerCountdown.gameObject.SetActive(false);
+        player.StopAllCoroutines();
+        player.superPowerActivated = false;
+        player.StartSmoothResetPos();
+
+        leaderboardManager.enabled = true;
+        scoreManager.ScoreText.gameObject.SetActive(false);
+        pipeSpawner.enabled = false;
+
+        player.enabled = false;
+    }
+
     void OnEnable()
     {
         Time.timeScale = 0f;
+        player.OnGameEnd += GameEnd;
     }
 
 }

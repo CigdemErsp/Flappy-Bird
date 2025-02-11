@@ -9,6 +9,7 @@ TagManager:
   - heart
   - Ground
   - Coin
+  - GameEnd
   layers:
   - Default
   - TransparentFX
