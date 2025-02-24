@@ -1,51 +1,40 @@
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
-using static Unity.IO.LowLevel.Unsafe.AsyncReadManagerMetrics;
+using UnityEngine.UI;
+
 
 public class DistanceTracker : MonoBehaviour
 {
     [SerializeField] private TMP_Text distanceText;
-    [SerializeField] private GameObject playerAvatar;
-    [SerializeField] private GameObject positionAnchor;
-    [SerializeField] private GameObject flag;
+    [SerializeField] private Slider distanceTracker;
 
     private float distanceTravelled = 0f;
-    private float newDistance = 0f;
-    private float speed;
     private float lengthOfTracker;
-    private float distanceNeededToWin;
 
     private Background background;
     private PipeSpawner pipeSpawner;
 
-    private void LengthOfTracker()
-    {
-        lengthOfTracker = Vector3.Distance(positionAnchor.transform.position, flag.transform.position); // distance of the tracker to calculate the movement of playerAvatar
-    }
+    public float DistanceTravelled { get { return distanceTravelled; } }
 
     private void Awake()
     {
         background = FindObjectOfType<Background>();
         pipeSpawner = FindObjectOfType<PipeSpawner>();
-        LengthOfTracker();
+        lengthOfTracker = pipeSpawner.DistanceNeededToWin;
+        distanceTracker.maxValue = lengthOfTracker + pipeSpawner.SpawnThreshold;
+        distanceTracker.value = 0f;
+
     }
 
     private void Update()
     {
-        newDistance = background.AnimationSpeed * Time.deltaTime;
-        distanceTravelled += newDistance; // incase of speed change
-
-        distanceNeededToWin = pipeSpawner.DistanceNeededToWin + pipeSpawner.SpawnThreshold; 
-
-        speed = lengthOfTracker * newDistance / distanceNeededToWin;
-
-        Debug.Log(speed);
-
-        playerAvatar.transform.position = new Vector3(playerAvatar.transform.position.x + speed, playerAvatar.transform.position.y, playerAvatar.transform.position.z);
-
+        distanceTravelled += background.AnimationSpeed * Time.deltaTime;
         distanceText.text = ((int)distanceTravelled).ToString();
+        distanceTracker.value = distanceTravelled;
+        Debug.Log(distanceTravelled);
     }
 
     public float GetDistanceTraveled()
@@ -55,8 +44,7 @@ public class DistanceTracker : MonoBehaviour
 
     public void ResetDistance() {  
         distanceTravelled = 0f;
-        playerAvatar.transform.localPosition = positionAnchor.transform.localPosition;
         distanceText.text = ((int)distanceTravelled).ToString();
+        distanceTracker.value = 0f;
     }
-
 }

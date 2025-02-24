@@ -21,7 +21,6 @@ public class Player : MonoBehaviour
     private void Awake()
     {
         scoreManager = FindObjectOfType<ScoreManager>();
-
     }
 
     private void Update()
@@ -85,6 +84,11 @@ public class Player : MonoBehaviour
         {
             collision.gameObject.transform.Find("Explosion").gameObject.SetActive(true);
             OnGameEnd?.Invoke();
+        }
+        else if(collision.gameObject.CompareTag("Checkpoint"))
+        {
+            collision.gameObject.transform.Find("Explosion").gameObject.SetActive(true);
+            FindObjectOfType<CheckpointManager>().SaveCheckpoint(scoreManager.Score, (int)FindObjectOfType<DistanceTracker>().DistanceTravelled, scoreManager.CoinCount);
         }
     }
 

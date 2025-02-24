@@ -16,9 +16,9 @@ public class PipeSpawner : MonoBehaviour
     private List<int> allPipes;
 
     private float lastSpawnDistance = 0f;
-    private float spawnThreshold = 3f; // Spawn every 3 distance traveled
+    private float spawnThreshold = 2f;
     private DistanceTracker distanceTracker;
-    private int distanceNeededToWin = 12;
+    private int distanceNeededToWin = 10;
 
     public int DistanceNeededToWin {  get { return distanceNeededToWin; } }
 
@@ -28,7 +28,6 @@ public class PipeSpawner : MonoBehaviour
     {
         if (distanceTracker.GetDistanceTraveled() - lastSpawnDistance >= spawnThreshold)
         {
-            Debug.Log("sasas");
             Spawn();
             lastSpawnDistance = distanceTracker.GetDistanceTraveled();
         }
