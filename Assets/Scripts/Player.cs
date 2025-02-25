@@ -1,7 +1,9 @@
 using System;
 using System.Collections;
 using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.SocialPlatforms.Impl;
 
 public class Player : MonoBehaviour
 {
@@ -159,6 +161,13 @@ public class Player : MonoBehaviour
     public void StartSmoothResetPos()
     {
         StartCoroutine(SmoothResetPos());
+    }
+
+    public void RestoreState(int newScore, int newDistance, int newCoins)
+    {
+        scoreManager.Score = newScore;
+        FindObjectOfType<DistanceTracker>().DistanceTravelled = newDistance;
+        scoreManager.CoinCount = newCoins;
     }
 
 }

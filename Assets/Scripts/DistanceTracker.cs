@@ -10,18 +10,19 @@ public class DistanceTracker : MonoBehaviour
 {
     [SerializeField] private TMP_Text distanceText;
     [SerializeField] private Slider distanceTracker;
+    [SerializeField] private Animator backgroundAnimator;
 
     private float distanceTravelled = 0f;
     private float lengthOfTracker;
+    private float animationSpeed;
 
-    private Background background;
     private PipeSpawner pipeSpawner;
 
-    public float DistanceTravelled { get { return distanceTravelled; } }
+    public float DistanceTravelled { get { return distanceTravelled; } set { distanceTravelled = value; } }
 
     private void Awake()
     {
-        background = FindObjectOfType<Background>();
+        animationSpeed = backgroundAnimator.speed;
         pipeSpawner = FindObjectOfType<PipeSpawner>();
         lengthOfTracker = pipeSpawner.DistanceNeededToWin;
         distanceTracker.maxValue = lengthOfTracker + pipeSpawner.SpawnThreshold;
@@ -31,10 +32,9 @@ public class DistanceTracker : MonoBehaviour
 
     private void Update()
     {
-        distanceTravelled += background.AnimationSpeed * Time.deltaTime;
+        distanceTravelled += animationSpeed * Time.deltaTime;
         distanceText.text = ((int)distanceTravelled).ToString();
         distanceTracker.value = distanceTravelled;
-        Debug.Log(distanceTravelled);
     }
 
     public float GetDistanceTraveled()
@@ -47,4 +47,12 @@ public class DistanceTracker : MonoBehaviour
         distanceText.text = ((int)distanceTravelled).ToString();
         distanceTracker.value = 0f;
     }
+
+    public void UpdateDistanceToCheckpoint(float checkpointDistance)
+    {
+        distanceTravelled = checkpointDistance;
+        distanceText.text = ((int)distanceTravelled).ToString();
+        distanceTracker.value = distanceTravelled;
+    }
+
 }

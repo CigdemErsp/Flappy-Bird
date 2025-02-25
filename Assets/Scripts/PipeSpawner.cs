@@ -5,6 +5,7 @@ using UnityEngine;
 public class PipeSpawner : MonoBehaviour
 {
     [SerializeField] private GameObject pipesPrefabWithHeart;
+    [SerializeField] private GameObject checkpoint;
     [SerializeField] private List<GameObject> pipesPrefabs;
     [SerializeField] private GameObject endFlag;
     
@@ -18,7 +19,11 @@ public class PipeSpawner : MonoBehaviour
     private float lastSpawnDistance = 0f;
     private float spawnThreshold = 2f;
     private DistanceTracker distanceTracker;
-    private int distanceNeededToWin = 10;
+    private readonly int distanceNeededToWin = 20;
+
+    private float minimumDistanceBetweenCheckpoints = 7f;
+    private int numberOfMaxCheckpoints;
+    private int numberOfCheckpoints;
 
     public int DistanceNeededToWin {  get { return distanceNeededToWin; } }
 
@@ -37,21 +42,31 @@ public class PipeSpawner : MonoBehaviour
     {
         distanceTracker = FindObjectOfType<DistanceTracker>();
         allPipes = new List<int>();
+
+        numberOfMaxCheckpoints = Mathf.FloorToInt(distanceNeededToWin / minimumDistanceBetweenCheckpoints) - 1;
+
+        if (numberOfMaxCheckpoints < 1)
+        {
+            numberOfMaxCheckpoints = 1;
+        }
     }
 
     private void OnEnable()
     {
         lastSpawnDistance = 0f;
-        Spawn();
     }
 
     private void OnDisable()
     {
+        numberOfCheckpoints = 0;
         CancelInvoke(nameof(Spawn));
         if (!gameObject.activeInHierarchy) return;
         ReplacePipe(pipesPrefabWithHeart);
+        
+        ReplaceFlag(checkpoint);
+        ReplaceFlag(endFlag);
 
-        if(pipesPrefabWithHeart.GetComponent<Pipes>().IsGapAdjusted)
+        if (pipesPrefabWithHeart.GetComponent<Pipes>().IsGapAdjusted)
             ResetGap(pipesPrefabWithHeart);
 
         foreach (var pipe in pipesPrefabs)
@@ -79,6 +94,14 @@ public class PipeSpawner : MonoBehaviour
             pipe = endFlag;
             pipe.GetComponent<EndFlag>().enabled = true;
             CancelInvoke(nameof(Spawn));
+        }
+        else if(numberOfCheckpoints <= numberOfMaxCheckpoints && 
+            (distanceTracker.GetDistanceTraveled() > ((numberOfCheckpoints + 1) * minimumDistanceBetweenCheckpoints) - 1 && 
+            distanceTracker.GetDistanceTraveled() < ((numberOfCheckpoints + 1) * minimumDistanceBetweenCheckpoints) + 1))
+        {
+            numberOfCheckpoints++;
+            pipe = checkpoint;
+            pipe.GetComponent<Checkpoint>().enabled = true;
         }
         else
         {
@@ -189,6 +212,13 @@ public class PipeSpawner : MonoBehaviour
         scoreBox.gameObject.SetActive(true);
         explosion.gameObject.SetActive(false);
         score.gameObject.SetActive(true);
+    }
+
+    public void ReplaceFlag(GameObject flag)
+    {
+        flag.GetComponent<FlagBase>().enabled = false;
+        flag.transform.position = new Vector3(10, -3.21000004f, 0);
+        flag.transform.Find("Explosion").gameObject.SetActive(false);
     }
 
 }

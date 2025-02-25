@@ -16,6 +16,8 @@ public class GameManager : MonoBehaviour
     [SerializeField] private Player player;   
     [SerializeField] private PipeSpawner pipeSpawner;
 
+    [SerializeField] private CheckpointData checkpointData;
+
     private ScoreManager scoreManager;
     private LeaderboardManager leaderboardManager;
 
@@ -33,11 +35,13 @@ public class GameManager : MonoBehaviour
 
     public void OnClick()
     {
+        FindObjectOfType<CheckpointManager>().LoadCheckpoint(player.gameObject);
+        FindObjectOfType<DistanceTracker>().UpdateDistanceToCheckpoint(checkpointData.Distance);
+        scoreManager.UpdateScoreManagerToCheckpoint(checkpointData.PlayerScore, checkpointData.PlayerCoin);
         leaderboardManager.enabled = false;
         scoreManager.ScoreText.gameObject.SetActive(false);
         pipeSpawner.enabled = false;
         getReady.SetActive(true);
-        FindObjectOfType<DistanceTracker>().ResetDistance();
 
         countdownText.gameObject.SetActive(true);
         player.enabled = false;
@@ -46,8 +50,6 @@ public class GameManager : MonoBehaviour
 
     public IEnumerator OnStart()
     {
-        scoreManager.Score = 0;
-        scoreManager.CoinCount = 0;
         FindObjectOfType<Pipes>().Score = scoreManager.Score;
         float countdown = 3f;
         playButton.SetActive(false);
@@ -75,7 +77,6 @@ public class GameManager : MonoBehaviour
         pipeSpawner.enabled = true;
         getReady.SetActive(false);
         scoreManager.ScoreText.gameObject.SetActive(true);
-        scoreManager.Score = 0;
 
         player.enabled = true;
     }

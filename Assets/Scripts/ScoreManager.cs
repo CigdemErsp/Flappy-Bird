@@ -68,4 +68,13 @@ public class ScoreManager : MonoBehaviour
         }
         leaderboardManager.AddScore(score, coinCount);
     }
+
+    public void UpdateScoreManagerToCheckpoint(int score, int coin)
+    {
+        this.score = score;
+        scoreText.text = ((int)score).ToString();
+
+        this.coinCount = coin;
+        coinCountText.text = "x " + coin.ToString();
+    }
 }

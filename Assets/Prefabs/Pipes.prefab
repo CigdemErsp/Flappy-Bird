@@ -11,7 +11,6 @@ GameObject:
   - component: {fileID: 3629880973458430439}
   - component: {fileID: 6022076700396068622}
   - component: {fileID: 2559128402304657172}
-  - component: {fileID: 1380268063937325641}
   m_Layer: 0
   m_Name: Coin
   m_TagString: Coin
@@ -121,23 +120,6 @@ CircleCollider2D:
   m_Offset: {x: 0, y: 0.067242235}
   serializedVersion: 2
   m_Radius: 1.284534
---- !u!114 &1380268063937325641
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1062117284886369165}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 27a777a8150febf4f9c5f89cd3cf2f13, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  sprites:
-  - {fileID: 8980438598086963491, guid: ede4b03d4049f481a80ce6756418b385, type: 3}
-  - {fileID: 3344596444136561788, guid: ede4b03d4049f481a80ce6756418b385, type: 3}
-  - {fileID: 1158639269171017508, guid: ede4b03d4049f481a80ce6756418b385, type: 3}
-  - {fileID: -6541766136644436370, guid: ede4b03d4049f481a80ce6756418b385, type: 3}
 --- !u!1 &1175203983700516507
 GameObject:
   m_ObjectHideFlags: 0
@@ -394,7 +376,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3d83a5e52c6c81a4f85a09c2f9f9c728, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speed: 5
+  isGapAdjusted: 0
 --- !u!1 &4775633300332680678
 GameObject:
   m_ObjectHideFlags: 0
