@@ -1,58 +1,74 @@
-using System.Collections;
-using System.Collections.Generic;
 using TMPro;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
 
 public class DistanceTracker : MonoBehaviour
 {
-    [SerializeField] private TMP_Text distanceText;
-    [SerializeField] private Slider distanceTracker;
-    [SerializeField] private Animator backgroundAnimator;
+    #region serializefields
+    [SerializeField] private TMP_Text _distanceText;
+    [SerializeField] private Slider _distanceTracker;
+    [SerializeField] private Animator _backgroundAnimator;
+    [SerializeField] private ObstacleSpawner _obstacleSpawner;
+    #endregion
 
-    private float distanceTravelled = 0f;
-    private float lengthOfTracker;
-    private float animationSpeed;
+    #region private fields
+    private float _distanceTravelled;
+    private float _lengthOfTracker;
+    private float _animationSpeed;
+    #endregion
 
-    private PipeSpawner pipeSpawner;
-
-    public float DistanceTravelled { get { return distanceTravelled; } set { distanceTravelled = value; } }
+    public float DistanceTravelled
+    {
+        get 
+        { 
+            return _distanceTravelled; 
+        }
+        set
+        {
+            _distanceTravelled = value;
+        }
+    }
 
     private void Awake()
     {
-        animationSpeed = backgroundAnimator.speed;
-        pipeSpawner = FindObjectOfType<PipeSpawner>();
-        lengthOfTracker = pipeSpawner.DistanceNeededToWin;
-        distanceTracker.maxValue = lengthOfTracker + pipeSpawner.SpawnThreshold;
-        distanceTracker.value = 0f;
-
+        _distanceTravelled = 0f;
+        _animationSpeed = _backgroundAnimator.speed;
+        _lengthOfTracker = _obstacleSpawner.DistanceNeededToWin;
+        _distanceTracker.maxValue = _lengthOfTracker + _obstacleSpawner.SpawnThreshold;
+        _distanceTracker.value = 0f;
     }
 
-    private void Update()
+    public void UpdateDistance()
     {
-        distanceTravelled += animationSpeed * Time.deltaTime;
-        distanceText.text = ((int)distanceTravelled).ToString();
-        distanceTracker.value = distanceTravelled;
+        _distanceTravelled += _animationSpeed * Time.deltaTime;
+        _distanceText.text = ((int)_distanceTravelled).ToString();
+        _distanceTracker.value = _distanceTravelled;
     }
 
-    public float GetDistanceTraveled()
+    public void ResetDistance()
     {
-        return distanceTravelled;
+        _distanceTravelled = 0f;
+        _distanceText.text = ((int)_distanceTravelled).ToString();
+        _distanceTracker.value = 0f;
     }
 
-    public void ResetDistance() {  
-        distanceTravelled = 0f;
-        distanceText.text = ((int)distanceTravelled).ToString();
-        distanceTracker.value = 0f;
-    }
-
+    // Update distance with checkpoint value
     public void UpdateDistanceToCheckpoint(float checkpointDistance)
     {
-        distanceTravelled = checkpointDistance;
-        distanceText.text = ((int)distanceTravelled).ToString();
-        distanceTracker.value = distanceTravelled;
+        _distanceTravelled = checkpointDistance;
+        _distanceText.text = ((int)_distanceTravelled).ToString();
+        _distanceTracker.value = _distanceTravelled;
+    }
+
+    private void OnEnable()
+    {
+        GameManager.Instance.OnUpdate += UpdateDistance;
+    }
+
+    private void OnDisable()
+    {
+        GameManager.Instance.OnUpdate -= UpdateDistance;
     }
 
 }

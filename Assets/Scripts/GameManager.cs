@@ -1,103 +1,179 @@
 using UnityEngine;
 using TMPro;
 using System.Collections;
-using UnityEngine.SceneManagement;
+using System;
 using System.Collections.Generic;
 
 public class GameManager : MonoBehaviour
 {
-    [SerializeField] private TMP_Text countdownText;
-    [SerializeField] private TMP_Text superPowerCountdown;
+    #region instance
+    public static GameManager Instance { get; private set; }
+    #endregion
 
-    [SerializeField] private GameObject playButton;
-    [SerializeField] private GameObject gameOver;
-    [SerializeField] private GameObject getReady;
+    #region actions
+    public event Action OnUpdate;
+    #endregion
 
-    [SerializeField] private Player player;   
-    [SerializeField] private PipeSpawner pipeSpawner;
+    #region serialize fields
+    [SerializeField] private TMP_Text _countdownText;
+    [SerializeField] private TMP_Text _superPowerCountdown;
 
-    [SerializeField] private CheckpointData checkpointData;
+    [SerializeField] private GameObject _playButton;
+    [SerializeField] private GameObject _gameOver;
+    [SerializeField] private GameObject _getReady;
 
-    private ScoreManager scoreManager;
-    private LeaderboardManager leaderboardManager;
+    [SerializeField] private Player _player;
+    [SerializeField] private ObstacleSpawner _obstacleSpawner;
+    [SerializeField] private CheckpointData _checkpointData;
+    [SerializeField] private ScoreManager _scoreManager;
+    [SerializeField] private LeaderboardManager _leaderboardManager;
+    [SerializeField] private CheckpointManager _checkpointManager;
+    [SerializeField] private DistanceTracker _distanceTracker;
+    [SerializeField] private List<Pipes> _pipes;
+
+    #endregion
+
+    private bool _isGameStarted;
 
     private void Awake()
     {
-        scoreManager = FindObjectOfType<ScoreManager>();
-        leaderboardManager = FindObjectOfType<LeaderboardManager>();
+        HandleSingleton();
 
-        player.enabled = false;
-        gameOver.SetActive(false);
-        Application.targetFrameRate = 60;   
-        pipeSpawner.enabled = false;
-        player.OnCountdownUpdated += UpdateCountdownText;
+        InitializeSettings();
+        InitializePlayer();
+        InitializeGame();
+    }
+
+    private void Update()
+    {
+        if (_isGameStarted)
+            OnUpdate?.Invoke();
+    }
+
+    private void HandleSingleton()
+    {
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+        Instance = this;
+        DontDestroyOnLoad(gameObject);
+    }
+
+    private void InitializeSettings()
+    {
+        Application.targetFrameRate = 60;
+    }
+
+    private void InitializePlayer()
+    {
+        _player.enabled = false;
+        _player.OnCountdownUpdated += UpdateCountdownText;
+    }
+
+    private void InitializeGame()
+    {
+        _gameOver.SetActive(false);
+        _obstacleSpawner.enabled = false;
+        _isGameStarted = false;
     }
 
     public void OnClick()
     {
-        FindObjectOfType<CheckpointManager>().LoadCheckpoint(player.gameObject);
-        FindObjectOfType<DistanceTracker>().UpdateDistanceToCheckpoint(checkpointData.Distance);
-        scoreManager.UpdateScoreManagerToCheckpoint(checkpointData.PlayerScore, checkpointData.PlayerCoin);
-        leaderboardManager.enabled = false;
-        scoreManager.ScoreText.gameObject.SetActive(false);
-        pipeSpawner.enabled = false;
-        getReady.SetActive(true);
+        StopPlayerMovement();
+        LoadCheckpointData();
+        DisableGameElements();
+        StartCountdown();
+        StartGame();
+    }
 
-        countdownText.gameObject.SetActive(true);
-        player.enabled = false;
+    private void StopPlayerMovement()
+    {
+        _player.GetComponent<Rigidbody2D>().simulated = false;
+    }
+
+    private void LoadCheckpointData()
+    {
+        _checkpointManager.LoadCheckpoint(_player.gameObject);
+        _distanceTracker.UpdateDistanceToCheckpoint(_checkpointData.Distance);
+        _scoreManager.UpdateScoreManagerToCheckpoint(_checkpointData.PlayerScore, _checkpointData.PlayerCoin);
+    }
+
+    private void DisableGameElements()
+    {
+        _leaderboardManager.enabled = false;
+        _scoreManager.ScoreText.gameObject.SetActive(false);
+        _obstacleSpawner.enabled = false;
+        _getReady.SetActive(true);
+        _countdownText.gameObject.SetActive(true);
+    }
+
+    private void StartCountdown()
+    {
+        _player.enabled = true;
+    }
+
+    private void StartGame()
+    {
         StartCoroutine(OnStart());
     }
 
     public IEnumerator OnStart()
     {
-        FindObjectOfType<Pipes>().Score = scoreManager.Score;
-        float countdown = 3f;
-        playButton.SetActive(false);
-        gameOver.SetActive(false);
+        foreach (var pipe in _pipes)
+        {
+            pipe.Score = _scoreManager.Score;
+        }
+
+        _playButton.SetActive(false);
+        _gameOver.SetActive(false);
 
         Time.timeScale = 1f;
 
-        while(countdown > 0)
+        // Countdown from 3 to 1
+        for (float countdown = 3f; countdown > 0; countdown--)
         {
-            countdownText.text = countdown.ToString();
-
-            // Wait for 1 second
+            _countdownText.text = countdown.ToString();
             yield return new WaitForSeconds(1);
-
-            // Decrement the countdown
-            countdown--;
         }
-        countdownText.gameObject.SetActive(false);
+
+        _countdownText.gameObject.SetActive(false);
         Play();
     }
 
+
     public void Play()
     {
-        FindObjectOfType<DistanceTracker>().enabled = true;
-        pipeSpawner.enabled = true;
-        getReady.SetActive(false);
-        scoreManager.ScoreText.gameObject.SetActive(true);
+        _isGameStarted = true;
+        _distanceTracker.enabled = true;
+        _obstacleSpawner.enabled = true;
+        _getReady.SetActive(false);
+        _scoreManager.ScoreText.gameObject.SetActive(true);
 
-        player.enabled = true;
+        _player.enabled = true;
+        _player.GetComponent<Rigidbody2D>().simulated = true;
     }
 
     public void Pause()
     {
-        FindObjectOfType<DistanceTracker>().enabled = false;
+        _isGameStarted = false;
+        _distanceTracker.enabled = false;
+        _player.enabled = false;
+        _player.GetComponent<Rigidbody2D>().simulated = false;
         Time.timeScale = 0f;
-        player.enabled = true;
     }
 
     public void GameOver()
     {
-        scoreManager.CheckHighscore();
-        gameOver.SetActive(true);
-        playButton.SetActive(true);
-        superPowerCountdown.gameObject.SetActive(false);
-        player.StopAllCoroutines();
-        player.superPowerActivated = false;
+        _scoreManager.CheckHighscore();
+        _gameOver.SetActive(true);
+        _playButton.SetActive(true);
+        _superPowerCountdown.gameObject.SetActive(false);
+        _player.StopAllCoroutines();
+        _player.SuperPowerActivated = false;
 
-        leaderboardManager.enabled = true;
+        _leaderboardManager.enabled = true;
 
         Pause();
     }
@@ -106,38 +182,40 @@ public class GameManager : MonoBehaviour
     {
         if (countdown >= 0)
         {
-            superPowerCountdown.text = countdown.ToString();
-            if (!superPowerCountdown.IsActive())
+            _superPowerCountdown.text = countdown.ToString();
+            if (!_superPowerCountdown.IsActive())
             {
-                superPowerCountdown.gameObject.SetActive(true);
+                _superPowerCountdown.gameObject.SetActive(true);
             }
         }
         else
         {
-            superPowerCountdown.gameObject.SetActive(false);
+            _superPowerCountdown.gameObject.SetActive(false);
         }
     }
 
-    public void GameEnd() 
+    private void GameEnd()
     {
-        FindObjectOfType<DistanceTracker>().enabled = false;
-        scoreManager.CheckHighscore();
-        superPowerCountdown.gameObject.SetActive(false);
-        player.StopAllCoroutines();
-        player.superPowerActivated = false;
-        player.StartSmoothResetPos();
+        _distanceTracker.enabled = false;
+        _scoreManager.CheckHighscore();
+        _superPowerCountdown.gameObject.SetActive(false);
+        _player.StopAllCoroutines();
+        _player.SuperPowerActivated = false;
+        _player.StartSmoothResetPos();
+        _player.GetComponent<Rigidbody2D>().simulated = false;
 
-        leaderboardManager.enabled = true;
-        scoreManager.ScoreText.gameObject.SetActive(false);
-        pipeSpawner.enabled = false;
+        _leaderboardManager.enabled = true;
+        _scoreManager.ScoreText.gameObject.SetActive(false);
+        _obstacleSpawner.enabled = false;
 
-        player.enabled = false;
+        _player.enabled = false;
     }
 
-    void OnEnable()
+    private void OnEnable()
     {
         Time.timeScale = 0f;
-        player.OnGameEnd += GameEnd;
+        _player.OnGameEnd += GameEnd;
+        _player.OnGameOver += GameOver;
     }
 
 }
