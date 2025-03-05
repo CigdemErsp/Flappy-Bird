@@ -5,8 +5,8 @@ using UnityEngine;
 public class ObstacleSpawner : MonoBehaviour
 {
     #region const fields
-    private const int _distanceNeededToWin = 20;
-    private const float _minimumDistanceBetweenCheckpoints = 7f;
+    private const int _distanceNeededToWin = 2;
+    private const float _minimumDistanceBetweenCheckpoints = 10f;
     #endregion
 
     #region serializefields

@@ -12,6 +12,8 @@ public class GameManager : MonoBehaviour
 
     #region actions
     public event Action OnUpdate;
+    public event Action OnStartGame;
+    public event Action OnEndGame;
     #endregion
 
     #region serialize fields
@@ -30,7 +32,8 @@ public class GameManager : MonoBehaviour
     [SerializeField] private CheckpointManager _checkpointManager;
     [SerializeField] private DistanceTracker _distanceTracker;
     [SerializeField] private List<Pipes> _pipes;
-
+    [SerializeField] private StartCutscene _startCutscene;
+    [SerializeField] private EndingCutscene _endingCutscene;
     #endregion
 
     private bool _isGameStarted;
@@ -70,6 +73,7 @@ public class GameManager : MonoBehaviour
     {
         _player.enabled = false;
         _player.OnCountdownUpdated += UpdateCountdownText;
+        _player.GetComponent<Rigidbody2D>().simulated = false;
     }
 
     private void InitializeGame()
@@ -81,7 +85,17 @@ public class GameManager : MonoBehaviour
 
     public void OnClick()
     {
+        Time.timeScale = 1f;
+        _startCutscene.OnCutsceneEnd += StartGameAfterCutscene; // Subscribe to event
         StopPlayerMovement();
+        OnStartGame?.Invoke();
+    }
+
+    private void StartGameAfterCutscene()
+    {
+        _startCutscene.OnCutsceneEnd -= StartGameAfterCutscene; // Unsubscribe to prevent multiple triggers
+
+        // Now continue with game logic
         LoadCheckpointData();
         DisableGameElements();
         StartCountdown();
@@ -90,6 +104,7 @@ public class GameManager : MonoBehaviour
 
     private void StopPlayerMovement()
     {
+        _player.enabled = true;
         _player.GetComponent<Rigidbody2D>().simulated = false;
     }
 
@@ -151,7 +166,6 @@ public class GameManager : MonoBehaviour
         _getReady.SetActive(false);
         _scoreManager.ScoreText.gameObject.SetActive(true);
 
-        _player.enabled = true;
         _player.GetComponent<Rigidbody2D>().simulated = true;
     }
 
@@ -166,6 +180,7 @@ public class GameManager : MonoBehaviour
 
     public void GameOver()
     {
+        _startCutscene.OnCutsceneEnd -= StartGameAfterCutscene;
         _scoreManager.CheckHighscore();
         _gameOver.SetActive(true);
         _playButton.SetActive(true);
@@ -201,8 +216,16 @@ public class GameManager : MonoBehaviour
         _superPowerCountdown.gameObject.SetActive(false);
         _player.StopAllCoroutines();
         _player.SuperPowerActivated = false;
-        _player.StartSmoothResetPos();
         _player.GetComponent<Rigidbody2D>().simulated = false;
+
+        _endingCutscene.OnCutsceneEnd += EndGameAfterCutscene;
+
+        OnEndGame?.Invoke();       
+    }
+
+    private void EndGameAfterCutscene()
+    {
+        _endingCutscene.OnCutsceneEnd -= EndGameAfterCutscene;
 
         _leaderboardManager.enabled = true;
         _scoreManager.ScoreText.gameObject.SetActive(false);
@@ -213,7 +236,6 @@ public class GameManager : MonoBehaviour
 
     private void OnEnable()
     {
-        Time.timeScale = 0f;
         _player.OnGameEnd += GameEnd;
         _player.OnGameOver += GameOver;
     }

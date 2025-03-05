@@ -36,11 +36,6 @@ public class Player : MonoBehaviour
         }
     }
 
-    public void StartSmoothResetPos()
-    {
-        StartCoroutine(SmoothResetPos());
-    }
-
     public void RestoreState(int newScore, int newDistance, int newCoins)
     {
         _scoreManager.Score = newScore;
@@ -171,7 +166,7 @@ public class Player : MonoBehaviour
 
     private void OnDisable()
     {
-        _superPower.gameObject.SetActive(false);
+        _superPower.SetActive(false);
     }
 
     // used in game over
@@ -182,33 +177,6 @@ public class Player : MonoBehaviour
         transform.position = position;
 
         transform.rotation = Quaternion.Euler(0, 0, 0);
-    }
-
-    // used in game end
-    private IEnumerator SmoothResetPos()
-    {
-        Vector3 startPosition = transform.position;
-        Vector3 targetPosition = new(transform.position.x, 0f, transform.position.z);
-        Quaternion startRotation = transform.rotation;
-        Quaternion targetRotation = Quaternion.Euler(0, 0, 0);
-
-        float duration = 1f; // Duration in seconds
-        int steps = 60; // Number of steps (frames) for the transition
-        float stepDuration = duration / steps;
-
-        for (int i = 0; i <= steps; i++)
-        {
-            float t = Mathf.Clamp01((float)i / steps);
-
-            transform.position = Vector3.Lerp(startPosition, targetPosition, t);
-            transform.rotation = Quaternion.Lerp(startRotation, targetRotation, t);
-
-            yield return new WaitForSeconds(stepDuration);
-        }
-
-        // Ensure the final state is exactly set.
-        transform.position = targetPosition;
-        transform.rotation = targetRotation;
     }
 
 }
