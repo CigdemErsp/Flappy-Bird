@@ -63,10 +63,6 @@ public class Player : MonoBehaviour
                 HandleScoreCollision();
                 break;
 
-            case "heart":
-                HandleHeartCollision(collision);
-                break;
-
             case "GameEnd":
                 HandleGameEndCollision(collision);
                 break;
@@ -103,16 +99,6 @@ public class Player : MonoBehaviour
     private void HandleScoreCollision()
     {
         _scoreManager.IncreaseScore();
-    }
-
-    private void HandleHeartCollision(Collider2D collision)
-    {
-        ActivateExplosion(collision);
-        collision.gameObject.SetActive(false);
-
-        _superPowerActivated = true;
-        _superPower.SetActive(true);
-        StartCoroutine(ActivateSuperPower());
     }
 
     private void HandleGameEndCollision(Collider2D collision)

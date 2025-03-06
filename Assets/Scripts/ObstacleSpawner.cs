@@ -5,12 +5,11 @@ using UnityEngine;
 public class ObstacleSpawner : MonoBehaviour
 {
     #region const fields
-    private const int _distanceNeededToWin = 2;
+    private const int _distanceNeededToWin = 100;
     private const float _minimumDistanceBetweenCheckpoints = 10f;
     #endregion
 
     #region serializefields
-    [SerializeField] private GameObject _pipesPrefabWithHeart;
     [SerializeField] private GameObject _checkpoint;
     [SerializeField] private List<GameObject> _pipesPrefabs;
     [SerializeField] private GameObject _endFlag;
@@ -99,8 +98,6 @@ public class ObstacleSpawner : MonoBehaviour
 
     private void ResetPipesAndFlags()
     {
-        ReplacePipe(_pipesPrefabWithHeart);
-
         foreach (var pipe in _pipesPrefabs)
         { 
             ReplacePipe(pipe);
@@ -112,11 +109,6 @@ public class ObstacleSpawner : MonoBehaviour
 
     private void ResetPipeGaps()
     {
-        if (_pipesPrefabWithHeart.GetComponent<Pipes>().IsGapAdjusted)
-        {
-            _pipesPrefabWithHeart.GetComponent<Pipes>().ResetGap(_pipesPrefabWithHeart);
-        }
-
         foreach (var pipe in _pipesPrefabs)
         {
             if (pipe.GetComponent<Pipes>().IsGapAdjusted)
@@ -156,11 +148,6 @@ public class ObstacleSpawner : MonoBehaviour
         return _distanceTracker.DistanceTravelled - _checkpointData.Distance == 0;
     }
 
-    private bool IsSuperPowerActive()
-    {
-        return IsNoPipeWithSuperPower() || _player.SuperPowerActivated;
-    }
-
     private GameObject HandleGameEnd()
     {
         GameObject pipe = _endFlag;
@@ -183,33 +170,11 @@ public class ObstacleSpawner : MonoBehaviour
     private GameObject HandlePipe()
     {
         GameObject pipe;
-        if(IsSuperPowerActive())
-        {
-            pipe = SpawnPipe();
-        }
-        else
-        {
-            pipe = RandomSpawnPipe();
-        }
+        pipe = SpawnPipe();
 
         pipe.GetComponent<Pipes>().enabled = true;
         AdjustPipeGapIfNeeded(pipe);
         return pipe;
-    }
-
-    private GameObject RandomSpawnPipe()
-    {
-        System.Random random = new System.Random();
-        if (random.Next(2) == 0) // Spawn heart
-        {
-            _pipesPrefabWithHeart.transform.position += Vector3.up * UnityEngine.Random.Range(_minHeight, _maxHeight);
-            UpdatePipes(1);
-            return _pipesPrefabWithHeart;
-        }
-        else
-        {
-            return SpawnPipe();
-        }
     }
 
     private GameObject SpawnPipe()

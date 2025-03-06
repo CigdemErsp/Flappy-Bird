@@ -13,7 +13,7 @@ public class StartCutscene : MonoBehaviour
 
     #region SerializeFields
     [SerializeField] private List<TMP_Text> _dialogueTexts;  // TextMeshPro text object to display the dialogue
-    [SerializeField] private List<CanvasGroup> _dialogueCanvasGroups;  // TextMeshPro text object to display the dialogue
+    [SerializeField] private List<CanvasGroup> _dialogueCanvasGroups;  
     [SerializeField] private GameObject _dialoguePanel; // Panel that holds the dialogue box
     
     [SerializeField] private CanvasGroup _gameCanvas; 
@@ -53,10 +53,11 @@ public class StartCutscene : MonoBehaviour
     private IEnumerator ShowDialogue(string text, TMP_Text _dialogueText, CanvasGroup _dialogueCanvasGroup)
     {
         _dialogueText.text = "";
+        _dialoguePanel.SetActive(true);
         _dialogueCanvasGroup.DOFade(1, fadeDuration);
         yield return new WaitForSeconds(fadeDuration);
         // Clear previous dialogue and show the panel
-        _dialoguePanel.SetActive(true);
+        
 
         // Use coroutine to display text letter by letter
         foreach (char letter in text)
