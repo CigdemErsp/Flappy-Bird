@@ -55,10 +55,6 @@ public class ObstacleSpawner : MonoBehaviour
         pipeGameObject.transform.position = new Vector3(10, 0, 0);
 
         Transform scoreBox = pipe.Coin;
-        if (scoreBox == null)
-        {
-            scoreBox = pipe.Heart;
-        }
 
         Transform explosion = pipe.Explosion;
         Transform score = pipe.ScoreBox;
@@ -82,6 +78,7 @@ public class ObstacleSpawner : MonoBehaviour
     private void OnEnable()
     {
         GameManager.Instance.OnUpdate += Spawn;
+        GameManager.Instance.OnPause -= Spawn;
         _lastSpawnDistance = 0f;
     }
 

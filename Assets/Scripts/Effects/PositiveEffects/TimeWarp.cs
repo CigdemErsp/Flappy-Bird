@@ -3,15 +3,16 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "TimeWarp", menuName = "Roguelike/Effects/TimeWarp")]
 public class TimeWarp : RoguelikeEffect
 {
-    private void Awake()
-    {
-        EffectName.text = "Time Warp";
-        Description.text = "Everything feels slightly slower.\n" +
-            "The game's speed is reduced by 10% for 5 seconds.";
-    }
+    //private void Awake()
+    //{
+    //    EffectName = "Time Warp";
+    //    Description = "Everything feels slightly slower.\n" +
+    //        "The game's speed is reduced by 10% for 5 seconds.";
+    //}
 
-    public void OnClick()
+    public override void OnClick()
     {
-        ApplyEffect();
+        Debug.Log($"GoldMaster Clicked! Name: {EffectName}, Description: {Description}");
+        base.ApplyEffect();
     }
 }

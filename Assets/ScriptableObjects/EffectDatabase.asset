@@ -12,4 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c7ab8e6b995fe9548817af495cd93d39, type: 3}
   m_Name: EffectDatabase
   m_EditorClassIdentifier: 
-  _effects: []
+  _effects:
+  - {fileID: 11400000, guid: 54e81e877b15c9e4b92670dabfdfae4e, type: 2}
+  - {fileID: 11400000, guid: 40c8f06dbd3fd144a8bf6fe1df63f261, type: 2}
+  - {fileID: 11400000, guid: 525e8455bdb24f64b940ca780e2c519f, type: 2}
+  - {fileID: 11400000, guid: 9e730a84a005c9d4db30f24fee0b3381, type: 2}
+  - {fileID: 11400000, guid: 86466acbe246001489723ed53aa338ac, type: 2}

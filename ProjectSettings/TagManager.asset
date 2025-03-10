@@ -12,6 +12,8 @@ TagManager:
   - GameEnd
   - Checkpoint
   - SceneEnd
+  - Effect Title
+  - Effect Description
   layers:
   - Default
   - TransparentFX

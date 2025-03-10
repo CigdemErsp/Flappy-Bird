@@ -7,4 +7,6 @@ public class EffectDatabase : ScriptableObject
     #region serializefields
     [SerializeField] private List<RoguelikeEffect> _effects;
     #endregion
+
+    public List<RoguelikeEffect> Effects { get { return _effects; } }
 }

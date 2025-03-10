@@ -14,6 +14,8 @@ public class GameManager : MonoBehaviour
     public event Action OnUpdate;
     public event Action OnStartGame;
     public event Action OnEndGame;
+    public event Action OnPause;
+    public event Action OnContinue;
     #endregion
 
     #region serialize fields
@@ -34,14 +36,25 @@ public class GameManager : MonoBehaviour
     [SerializeField] private List<Pipes> _pipes;
     [SerializeField] private StartCutscene _startCutscene;
     [SerializeField] private EndingCutscene _endingCutscene;
+    [SerializeField] private RoguelikeEffect _roguelikeEffect;
+
+    [SerializeField] private Animator _backgroundAnimator;
+    [SerializeField] private Animator _groundAnimator;
     #endregion
 
+    #region private fields
     private bool _isGameStarted;
+    private bool _isGamePaused;
+
+    private float _backgroundAnimationSpeed;
+    private float _groundAnimationSpeed;
+    #endregion
 
     private void Awake()
     {
         HandleSingleton();
 
+        HandleAnimationSpeed();
         InitializeSettings();
         InitializePlayer();
         InitializeGame();
@@ -49,8 +62,18 @@ public class GameManager : MonoBehaviour
 
     private void Update()
     {
+        if (_isGamePaused) return;
+
         if (_isGameStarted)
+        {
             OnUpdate?.Invoke();
+        }
+    }
+
+    private void HandleAnimationSpeed()
+    {
+        _backgroundAnimationSpeed = _backgroundAnimator.speed;
+        _groundAnimationSpeed = _groundAnimator.speed;
     }
 
     private void HandleSingleton()
@@ -87,7 +110,8 @@ public class GameManager : MonoBehaviour
     {
         Time.timeScale = 1f;
         _startCutscene.OnCutsceneEnd += StartGameAfterCutscene; // Subscribe to event
-        StopPlayerMovement();
+
+        OnContinue?.Invoke();
         OnStartGame?.Invoke();
     }
 
@@ -96,6 +120,7 @@ public class GameManager : MonoBehaviour
         _startCutscene.OnCutsceneEnd -= StartGameAfterCutscene; // Unsubscribe to prevent multiple triggers
 
         // Now continue with game logic
+        StopPlayerMovement();
         LoadCheckpointData();
         DisableGameElements();
         StartCountdown();
@@ -118,9 +143,9 @@ public class GameManager : MonoBehaviour
     private void DisableGameElements()
     {
         _leaderboardManager.enabled = false;
-        _scoreManager.ScoreText.gameObject.SetActive(false);
-        _obstacleSpawner.enabled = false;
+        _scoreManager.ScoreText.gameObject.SetActive(false);  
         _getReady.SetActive(true);
+        _obstacleSpawner.enabled = false;
         _countdownText.gameObject.SetActive(true);
     }
 
@@ -161,12 +186,16 @@ public class GameManager : MonoBehaviour
     public void Play()
     {
         _isGameStarted = true;
+        _isGamePaused = false;
         _distanceTracker.enabled = true;
         _obstacleSpawner.enabled = true;
         _getReady.SetActive(false);
         _scoreManager.ScoreText.gameObject.SetActive(true);
 
         _player.GetComponent<Rigidbody2D>().simulated = true;
+
+        _backgroundAnimator.speed = _backgroundAnimationSpeed;
+        _groundAnimator.speed = _groundAnimationSpeed; 
     }
 
     public void Pause()
@@ -175,7 +204,11 @@ public class GameManager : MonoBehaviour
         _distanceTracker.enabled = false;
         _player.enabled = false;
         _player.GetComponent<Rigidbody2D>().simulated = false;
-        Time.timeScale = 0f;
+        _isGamePaused = true;
+        _backgroundAnimator.speed = 0f;
+        _groundAnimator.speed = 0f;
+
+        OnPause?.Invoke();
     }
 
     public void GameOver()
@@ -234,10 +267,23 @@ public class GameManager : MonoBehaviour
         _player.enabled = false;
     }
 
+    private void EnablePopUp()
+    {
+        Pause();
+        _roguelikeEffect.OnEffectSelected += ContinueGameAfterPopUp;
+    }
+
+    private void ContinueGameAfterPopUp(RoguelikeEffect roguelikeEffect)
+    {
+        Debug.Log(roguelikeEffect.EffectName);
+    }
+
     private void OnEnable()
     {
         _player.OnGameEnd += GameEnd;
         _player.OnGameOver += GameOver;
+
+        _distanceTracker.OnDistanceThresholdReached += EnablePopUp;
     }
 
 }

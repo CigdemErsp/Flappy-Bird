@@ -3,15 +3,16 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "Superpower", menuName = "Roguelike/Effects/Superpower")]
 public class Superpower : RoguelikeEffect
 {
-    private void Awake()
-    {
-        EffectName.text = "Superpower";
-        Description.text = "A mystical force grants you another chance.\n" +
-            "You are invulnerable for 10 seconds.";
-    }
+    //private void Awake()
+    //{
+    //    EffectName = "Superpower";
+    //    Description = "A mystical force grants you another chance.\n" +
+    //        "You are invulnerable for 10 seconds.";
+    //}
 
-    public void OnClick()
+    public override void OnClick()
     {
-        ApplyEffect();
+        Debug.Log($"GoldMaster Clicked! Name: {EffectName}, Description: {Description}");
+        base.ApplyEffect();
     }
 }

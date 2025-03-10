@@ -36,6 +36,7 @@ public class FlagBase : MonoBehaviour
     private void OnEnable()
     {
         GameManager.Instance.OnUpdate += MoveFlag;
+        GameManager.Instance.OnPause -= MoveFlag;
     }
 
     private void OnDisable()

@@ -14,7 +14,6 @@ public class Pipes : MonoBehaviour
     [SerializeField] private Transform _bottomPipe;
     [SerializeField] private Transform _scoreBox;
     [SerializeField] private Transform _coin;
-    [SerializeField] private Transform _heart;
     [SerializeField] private Transform _explosion;
     #endregion
 
@@ -25,11 +24,10 @@ public class Pipes : MonoBehaviour
     private Vector3 _initialPosition;
     private bool _isGapAdjusted;
     private float _offset;
+    private bool _onPause = false;
     #endregion
 
     public Transform Coin { get {  return _coin; } }
-
-    public Transform Heart { get { return _heart; } }
 
     public Transform Explosion { get { return _explosion; } }
 
@@ -72,6 +70,11 @@ public class Pipes : MonoBehaviour
 
     private void MovePipeVertically()
     {
+        if (_onPause)
+        {
+            return;
+        }
+
         _speed = _backgroundAnimator.speed * 5;
         transform.position += _speed * Time.deltaTime * Vector3.left;
 
@@ -84,9 +87,10 @@ public class Pipes : MonoBehaviour
             // Reverse direction when reaching the vertical limits
             if (CheckIfPipeInLimit())
             {
-                _movingUp *= -1; // Reverse direction
+            _movingUp *= -1; // Reverse direction
             }
         }
+
     }
 
     private bool CheckIfPipeInLimit()
@@ -102,9 +106,21 @@ public class Pipes : MonoBehaviour
         _score = _scoreManager.Score;
     }
 
+    private void OnPause()
+    {
+        _onPause = true;
+    }
+    
+    private void OnContinue()
+    {
+        _onPause = false;
+    }
+
     private void OnEnable()
     {
         GameManager.Instance.OnUpdate += MovePipeVertically;
+        GameManager.Instance.OnPause += OnPause;
+        GameManager.Instance.OnContinue += OnContinue;
         UpdateScore();
         _initialPosition = transform.position;
     }
@@ -112,6 +128,8 @@ public class Pipes : MonoBehaviour
     private void OnDisable()
     {
         GameManager.Instance.OnUpdate -= MovePipeVertically;
+        GameManager.Instance.OnPause -= OnPause;
+        GameManager.Instance.OnContinue -= OnContinue;
     }
 
     private void OnTriggerEnter2D(Collider2D collision)

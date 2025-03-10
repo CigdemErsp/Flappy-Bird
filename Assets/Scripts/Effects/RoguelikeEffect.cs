@@ -1,46 +1,29 @@
 using System;
-using TMPro;
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "NewEffect", menuName = "Roguelike/Effect")]
 public class RoguelikeEffect : ScriptableObject
 {
     #region actions
-    public static event Action<RoguelikeEffect> OnEffectApplied;
+    public event Action<RoguelikeEffect> OnEffectSelected;
     #endregion
 
     #region serializefields
-    [SerializeField] private TMP_Text _effectName;
-    [SerializeField] private TMP_Text _description;
+    [SerializeField] private string _effectName;
+    [SerializeField] private string _description;
     #endregion
 
-    public TMP_Text EffectName 
-    {  
-        get 
-        { 
-            return _effectName; 
-        }
-        set
-        {
-            _effectName = value;
-        }
-    }
+    public string EffectName => _effectName;
+    public string Description => _description;
 
-    public TMP_Text Description
+    public virtual void OnClick()
     {
-        get
-        {
-            return _description;
-        }
-        set
-        {
-            _description = value;
-        }
+        ApplyEffect();
     }
 
-    public virtual void ApplyEffect()
+    public void ApplyEffect()
     {
         Debug.Log(this.EffectName);
-        OnEffectApplied?.Invoke(this);
+        OnEffectSelected?.Invoke(this);
     }
 }
