@@ -14,6 +14,11 @@ public class ScoreManager : MonoBehaviour
     [SerializeField] private TMP_Text _coinCountText;
     [SerializeField] private TMP_Text _scoreText;
     [SerializeField] private TMP_Text _highscoreText;
+    [SerializeField] private PopUpManager _popUpManager;
+    #endregion
+
+    #region private fields
+    private int _coinMultiplier;
     #endregion
 
     public int Score
@@ -49,6 +54,7 @@ public class ScoreManager : MonoBehaviour
     private void Start()
     {
         _highscoreText.text = "Highscore: " + PlayerPrefs.GetInt("Highscore");
+        _coinMultiplier = 1;
     }
 
     public void IncreaseScore()
@@ -59,7 +65,7 @@ public class ScoreManager : MonoBehaviour
 
     public void IncreaseCoinCount()
     {
-        _coinCount += 1;
+        _coinCount += _coinMultiplier;
         _coinCountText.text = "x " + _coinCount.ToString();
     }
 
@@ -83,4 +89,30 @@ public class ScoreManager : MonoBehaviour
         _coinCountText.text = "x " + coin.ToString();
     }
 
+    private void ApplyEffect(RoguelikeEffect roguelikeEffect)
+    {
+        // in case more effects will be added
+        switch(roguelikeEffect.EffectName)
+        {
+            case "Gold Master":
+                _coinMultiplier *= 2;
+                break;
+        }
+    }
+
+    private void ResetEffects()
+    {
+        _coinMultiplier = 1;
+    }
+
+    private void OnEnable()
+    {
+        _popUpManager.OnEffectSelected += ApplyEffect;
+        GameManager.Instance.OnGameOver += ResetEffects;
+    }
+
+    private void OnDisable()
+    {
+        _popUpManager.OnEffectSelected -= ApplyEffect;
+    }
 }

@@ -34,19 +34,19 @@ public class StartCutscene : MonoBehaviour
 
     private IEnumerator PlayCutscene()
     {
-        //if (!_checkpointData.HasCheckpoint)
-        //{
-        //    yield return FadeInDialogue();
+        if (!_checkpointData.HasCheckpoint)
+        {
+            yield return FadeInDialogue();
 
-        //    // Start the dialogue
-        //    yield return ShowDialogue("Owl: 'Welcome to the Sky Temple, little bird.'", _dialogueTexts[0], _dialogueCanvasGroups[0]);
-        //    yield return ShowDialogue("Flappy Bird: 'I’ve traveled far to reach this place...'", _dialogueTexts[1], _dialogueCanvasGroups[1]);
-        //    yield return ShowDialogue("Owl: 'The trials ahead will test your courage.'", _dialogueTexts[2], _dialogueCanvasGroups[2]);
-        //    yield return ShowDialogue("Flappy Bird: 'I’m ready! Let me face the challenges!'", _dialogueTexts[3], _dialogueCanvasGroups[3]);
+            // Start the dialogue
+            yield return ShowDialogue("Owl: 'Welcome to the Sky Temple, little bird.'", _dialogueTexts[0], _dialogueCanvasGroups[0]);
+            yield return ShowDialogue("Flappy Bird: 'I’ve traveled far to reach this place...'", _dialogueTexts[1], _dialogueCanvasGroups[1]);
+            yield return ShowDialogue("Owl: 'The trials ahead will test your courage.'", _dialogueTexts[2], _dialogueCanvasGroups[2]);
+            yield return ShowDialogue("Flappy Bird: 'I’m ready! Let me face the challenges!'", _dialogueTexts[3], _dialogueCanvasGroups[3]);
 
-        //    yield return FadeOutDialogueAndStartGame();
-        //}
-        yield return new WaitForEndOfFrame();
+            yield return FadeOutDialogueAndStartGame();
+        }
+
         OnCutsceneEnd?.Invoke();
     }
 

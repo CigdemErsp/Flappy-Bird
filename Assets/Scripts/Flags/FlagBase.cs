@@ -15,14 +15,15 @@ public class FlagBase : MonoBehaviour
 
     public Transform Explosion { get { return _explosion; } }
 
-    private void Awake()
-    {
-        _speed = _backgroundAnimator.speed * 5;
-    }
-
     public void MoveFlag()
     {
+        SetSpeed();
         transform.position += _speed * Time.deltaTime * Vector3.left;
+    }
+
+    private void SetSpeed()
+    {
+        _speed = _backgroundAnimator.speed * 5;
     }
 
     private void OnTriggerEnter2D(Collider2D collision)

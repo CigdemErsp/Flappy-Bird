@@ -51,19 +51,12 @@ public class DistanceTracker : MonoBehaviour
         _distanceTravelled += _animationSpeed * Time.deltaTime;
         _distanceText.text = ((int)_distanceTravelled).ToString();
         _distanceTracker.value = _distanceTravelled;
-
-        if (IsDistanceThresholdReached())
+        
+        if (IsDistanceThresholdReached() && (int)_distanceTravelled % _distanceThreshold == 0)
         {
             _lastThreshold += _distanceThreshold;
             OnDistanceThresholdReached?.Invoke();
         }
-    }
-
-    public void ResetDistance()
-    {
-        _distanceTravelled = 0f;
-        _distanceText.text = ((int)_distanceTravelled).ToString();
-        _distanceTracker.value = 0f;
     }
 
     // Update distance with checkpoint value
@@ -72,11 +65,20 @@ public class DistanceTracker : MonoBehaviour
         _distanceTravelled = checkpointDistance;
         _distanceText.text = ((int)_distanceTravelled).ToString();
         _distanceTracker.value = _distanceTravelled;
+
+        if (_lastThreshold >= _distanceThreshold)
+        {
+            _lastThreshold = Mathf.FloorToInt(_distanceTravelled / _distanceThreshold) * _distanceThreshold;
+        }
+        else
+        {
+            _lastThreshold = 0f;
+        }
     }
 
     private bool IsDistanceThresholdReached()
     {
-        return _distanceTravelled >= _lastThreshold + _distanceThreshold;
+        return _distanceTravelled > _lastThreshold + _distanceThreshold;
     }
 
     private void OnEnable()

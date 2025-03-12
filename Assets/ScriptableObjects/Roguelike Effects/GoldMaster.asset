@@ -12,5 +12,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2a4eee9d417e0b34396b2062f81d39fc, type: 3}
   m_Name: GoldMaster
   m_EditorClassIdentifier: 
-  _effectName: {fileID: 0}
-  _description: {fileID: 0}
+  _effectName: Gold Master
+  _description: You will collect double the coins!\nDoubles the coins you collect.

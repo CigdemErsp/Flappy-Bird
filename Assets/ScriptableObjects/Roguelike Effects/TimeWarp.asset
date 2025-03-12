@@ -12,5 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 56c49bdd3c4f92d468a99c47f50e10a4, type: 3}
   m_Name: TimeWarp
   m_EditorClassIdentifier: 
-  _effectName: {fileID: 0}
-  _description: {fileID: 0}
+  _effectName: Time Warp
+  _description: Everything feels slightly slower.\nThe game's speed is reduced by
+    10% for 5 seconds.

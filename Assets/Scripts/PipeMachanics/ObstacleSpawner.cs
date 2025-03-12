@@ -5,7 +5,7 @@ using UnityEngine;
 public class ObstacleSpawner : MonoBehaviour
 {
     #region const fields
-    private const int _distanceNeededToWin = 100;
+    private const int _distanceNeededToWin = 15;
     private const float _minimumDistanceBetweenCheckpoints = 10f;
     #endregion
 
@@ -85,7 +85,6 @@ public class ObstacleSpawner : MonoBehaviour
     private void OnDisable()
     {
         GameManager.Instance.OnUpdate -= Spawn;
-        _numberOfCheckpoints = 0;
 
         if (!gameObject.activeInHierarchy) return;
 
@@ -192,12 +191,6 @@ public class ObstacleSpawner : MonoBehaviour
             pipe.GetComponent<Pipes>().NarrowGap(pipe);
             _score++;
         }
-    }
-
-    private bool IsNoPipeWithSuperPower()
-    {
-        // if there is pipe in scene and it does not contain superpower
-        return _allPipes.Count != 0 && _allPipes.Contains(1);
     }
 
     private bool IsNextCheckpointDue()

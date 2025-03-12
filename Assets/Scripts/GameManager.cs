@@ -16,6 +16,7 @@ public class GameManager : MonoBehaviour
     public event Action OnEndGame;
     public event Action OnPause;
     public event Action OnContinue;
+    public event Action OnGameOver;
     #endregion
 
     #region serialize fields
@@ -37,6 +38,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private StartCutscene _startCutscene;
     [SerializeField] private EndingCutscene _endingCutscene;
     [SerializeField] private RoguelikeEffect _roguelikeEffect;
+    [SerializeField] private PopUpManager _popUpManager;
 
     [SerializeField] private Animator _backgroundAnimator;
     [SerializeField] private Animator _groundAnimator;
@@ -185,6 +187,8 @@ public class GameManager : MonoBehaviour
 
     public void Play()
     {
+        OnContinue?.Invoke();
+
         _isGameStarted = true;
         _isGamePaused = false;
         _distanceTracker.enabled = true;
@@ -218,10 +222,11 @@ public class GameManager : MonoBehaviour
         _gameOver.SetActive(true);
         _playButton.SetActive(true);
         _superPowerCountdown.gameObject.SetActive(false);
-        _player.StopAllCoroutines();
-        _player.SuperPowerActivated = false;
 
         _leaderboardManager.enabled = true;
+
+        OnGameOver?.Invoke();
+        ResetEffects();
 
         Pause();
     }
@@ -270,12 +275,45 @@ public class GameManager : MonoBehaviour
     private void EnablePopUp()
     {
         Pause();
-        _roguelikeEffect.OnEffectSelected += ContinueGameAfterPopUp;
+        _popUpManager.OnPopUpDisabled += ContinueGameAfterPopUp;
     }
 
-    private void ContinueGameAfterPopUp(RoguelikeEffect roguelikeEffect)
+    private void ContinueGameAfterPopUp()
     {
-        Debug.Log(roguelikeEffect.EffectName);
+        Play();
+    }
+
+    private void ApplyEffect(RoguelikeEffect roguelikeEffect)
+    {
+        switch(roguelikeEffect.EffectName)
+        {
+            case "Time Warp":
+                StartCoroutine(TimeWarp());
+                break;
+        }
+    }
+
+    private void ResetEffects()
+    {
+        StopCoroutine(TimeWarp());
+
+        _backgroundAnimator.speed = _backgroundAnimationSpeed;
+        _groundAnimator.speed = _groundAnimationSpeed;
+    }
+
+    private IEnumerator TimeWarp()
+    {
+        _backgroundAnimator.speed = _backgroundAnimationSpeed * 0.9f;
+        _groundAnimator.speed = _groundAnimationSpeed * 0.9f;
+
+        for (float countdown = 10f; countdown >= 0; countdown--)
+        {
+            // Wait for 1 second
+            yield return new WaitForSeconds(1);
+        }
+
+        _backgroundAnimator.speed = _backgroundAnimationSpeed;
+        _groundAnimator.speed = _groundAnimationSpeed;
     }
 
     private void OnEnable()
@@ -284,6 +322,7 @@ public class GameManager : MonoBehaviour
         _player.OnGameOver += GameOver;
 
         _distanceTracker.OnDistanceThresholdReached += EnablePopUp;
+        _popUpManager.OnEffectSelected += ApplyEffect;
     }
 
 }

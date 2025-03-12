@@ -16,12 +16,16 @@ public class Player : MonoBehaviour
     [SerializeField] private DistanceTracker _distanceTracker;
     [SerializeField] private CheckpointManager _checkpointManager;
     [SerializeField] private Rigidbody2D _rigidbody;
+    [SerializeField] private CircleCollider2D _circleCollider;
     [SerializeField] private ObstacleSpawner _obstacleSpawner;
+    [SerializeField] private PopUpManager _popUpManager;
     #endregion
 
     #region private fields
     private Vector3 _direction;
     private bool _superPowerActivated = false;
+    private float _originalGravity;
+    private float _colliderRadius;
     #endregion
 
     public bool SuperPowerActivated 
@@ -34,6 +38,12 @@ public class Player : MonoBehaviour
         {
             _superPowerActivated = value;
         }
+    }
+
+    private void Awake()
+    {
+        _colliderRadius = _circleCollider.radius;
+        _originalGravity = _rigidbody.gravityScale;
     }
 
     public void RestoreState(int newScore, int newDistance, int newCoins)
@@ -131,6 +141,9 @@ public class Player : MonoBehaviour
 
     private IEnumerator ActivateSuperPower()
     {
+        _superPowerActivated = true;
+        _superPower.SetActive(true);
+
         Time.timeScale = 1f;
 
         for (float countdown = 10f; countdown >= 0; countdown--)
@@ -148,10 +161,70 @@ public class Player : MonoBehaviour
     private void OnEnable()
     {
         ResetPos();
+        _popUpManager.OnEffectSelected += ApplyEffect;
+        GameManager.Instance.OnGameOver += ResetEffects;
     }
 
     private void OnDisable()
     {
+        _superPower.SetActive(false);
+    }
+
+    private void ApplyEffect(RoguelikeEffect roguelikeEffect)
+    {
+        switch (roguelikeEffect.EffectName)
+        {
+            case "Featherweight":
+                // gravity reduced for 10 seconds
+                StartCoroutine(ApplyFeatherweightEffect());
+                break;
+            case "Shrinking Serum":
+                // hitbox ½15 smaller
+                StartCoroutine(ApplyShrinkingSerumEffect());
+                break;
+            case "Superpower":
+                StartCoroutine(ActivateSuperPower());
+                break;
+        }
+    }
+
+    private IEnumerator ApplyFeatherweightEffect()
+    {
+        _rigidbody.gravityScale = _originalGravity * 0.9f; // Reduce gravity by 10%
+
+        yield return StartCoroutine(Countdown());
+
+        _rigidbody.gravityScale = _originalGravity;
+    }
+
+    private IEnumerator ApplyShrinkingSerumEffect()
+    {
+        _circleCollider.radius = _circleCollider.radius * 0.85f;
+
+        yield return StartCoroutine(Countdown());
+
+        _circleCollider.radius = _colliderRadius;
+    }
+
+    private IEnumerator Countdown()
+    {
+        for (float countdown = 10f; countdown >= 0; countdown--)
+        {
+            // Wait for 1 second
+            yield return new WaitForSeconds(1);
+        }
+    }
+
+    private void ResetEffects()
+    {
+        // Reset effects in case of game over
+        StopAllCoroutines();
+
+        _circleCollider.radius = _colliderRadius;
+        Vector2 originalGravity = new(0, _originalGravity);
+        _rigidbody.gravityScale = _originalGravity;
+
+        _superPowerActivated = false;
         _superPower.SetActive(false);
     }
 
@@ -160,9 +233,8 @@ public class Player : MonoBehaviour
     {
         Vector2 position = transform.position;
         position.y = 0f;
-        transform.position = position;
-
-        transform.rotation = Quaternion.Euler(0, 0, 0);
+        
+        transform.SetPositionAndRotation(position, Quaternion.Euler(0, 0, 0));
     }
 
 }

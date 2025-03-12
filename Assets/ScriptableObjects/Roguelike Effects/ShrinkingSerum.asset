@@ -12,5 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cc5f6a4b9ac234f4596f7206117d772d, type: 3}
   m_Name: ShrinkingSerum
   m_EditorClassIdentifier: 
-  _effectName: {fileID: 0}
-  _description: {fileID: 0}
+  _effectName: Shrinking Serum
+  _description: You feel smaller and more agile.\nYour character's hitbox shrinks
+    by 15%

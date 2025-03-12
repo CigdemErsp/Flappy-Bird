@@ -12,5 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e4fe0185770173c47a5001d23b422b00, type: 3}
   m_Name: Featherweight
   m_EditorClassIdentifier: 
-  _effectName: {fileID: 0}
-  _description: {fileID: 0}
+  _effectName: Featherweight
+  _description: Your body feels lighter than air!\nYour gravity is reduced for 10
+    seconds, making it easier to stay in the air.

@@ -2837,6 +2837,14 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1783276646780061819, guid: 1c0520325bd5b534188c40bef406dc5c, type: 3}
+      propertyPath: looping
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1783276646780061819, guid: 1c0520325bd5b534188c40bef406dc5c, type: 3}
+      propertyPath: prewarm
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -3255,6 +3263,7 @@ MonoBehaviour:
   _coinCountText: {fileID: 1536381682}
   _scoreText: {fileID: 745091054}
   _highscoreText: {fileID: 117803412}
+  _popUpManager: {fileID: 1524957310}
 --- !u!4 &823716827
 Transform:
   m_ObjectHideFlags: 0
@@ -4664,7 +4673,9 @@ MonoBehaviour:
   _distanceTracker: {fileID: 1857936015}
   _checkpointManager: {fileID: 1014785327}
   _rigidbody: {fileID: 1069757105}
+  _circleCollider: {fileID: 1069757104}
   _obstacleSpawner: {fileID: 684509875}
+  _popUpManager: {fileID: 1524957310}
 --- !u!95 &1069757109
 Animator:
   serializedVersion: 5
@@ -6699,6 +6710,7 @@ MonoBehaviour:
   _startCutscene: {fileID: 156531348}
   _endingCutscene: {fileID: 943272312}
   _roguelikeEffect: {fileID: 11400000, guid: 71b6d2bd39fa38543b0ded2dcfa65d7e, type: 2}
+  _popUpManager: {fileID: 1524957310}
   _backgroundAnimator: {fileID: 2058910590}
   _groundAnimator: {fileID: 653657540}
 --- !u!4 &1447305924
@@ -9497,6 +9509,14 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1783276646780061817, guid: 1c0520325bd5b534188c40bef406dc5c, type: 3}
       propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1783276646780061819, guid: 1c0520325bd5b534188c40bef406dc5c, type: 3}
+      propertyPath: looping
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1783276646780061819, guid: 1c0520325bd5b534188c40bef406dc5c, type: 3}
+      propertyPath: prewarm
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []

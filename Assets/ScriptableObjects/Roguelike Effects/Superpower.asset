@@ -12,5 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: edd31ced5a08a4642b7eaaa5bb0f91f0, type: 3}
   m_Name: Superpower
   m_EditorClassIdentifier: 
-  _effectName: {fileID: 0}
-  _description: {fileID: 0}
+  _effectName: Superpower
+  _description: A mystical force grants you another chance.\nYou are invulnerable
+    for 10 seconds.
